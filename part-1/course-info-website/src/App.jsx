@@ -14,6 +14,7 @@ const App = () => {
       <Total partAndExerciseCountArray={[[part1, exercises1], [part2, exercises2], [part3, exercises3]]}/>
     </div>
   )
+
 }
 
 function Header({course}) {
@@ -24,18 +25,13 @@ function Header({course}) {
   );
 }
 
+
 function Content({partAndExerciseCountArray}) {
   return (
     <>
-      <p>
-        {partAndExerciseCountArray[0][0]} {partAndExerciseCountArray[0][1]}
-      </p>
-      <p>
-        {partAndExerciseCountArray[1][0]} {partAndExerciseCountArray[1][1]}
-      </p>
-      <p>
-        {partAndExerciseCountArray[2][0]} {partAndExerciseCountArray[2][1]}
-      </p>
+      <Part partN={partAndExerciseCountArray[0][0]} exercisesN={partAndExerciseCountArray[0][1]}></Part>
+      <Part partN={partAndExerciseCountArray[1][0]} exercisesN={partAndExerciseCountArray[1][1]}></Part>
+      <Part partN={partAndExerciseCountArray[2][0]} exercisesN={partAndExerciseCountArray[2][1]}></Part>
     </>
   );
 }
@@ -49,6 +45,16 @@ function Total({partAndExerciseCountArray}) {
   return (
     <>
       <p>Number of exercises {totalExerciseCount}</p>
+    </>
+  );
+}
+
+function Part({partN, exercisesN}) {
+  return (
+    <>
+      <p>
+        {partN} {exercisesN}
+      </p>
     </>
   );
 }
