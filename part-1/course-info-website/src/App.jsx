@@ -7,25 +7,43 @@ const App = () => {
   // const part3 = 'State of a component'
   // const exercises3 = 14
 
-  const course = 'Half Stack application development'
-  const part1 = {
-    name: 'Fundamentals of React',
-    exercises: 10
-  }
-  const part2 = {
-    name: 'Using props to pass data',
-    exercises: 7
-  }
-  const part3 = {
-    name: 'State of a component',
-    exercises: 14
+  // const course = 'Half Stack application development'
+  // const part1 = {
+  //   name: 'Fundamentals of React',
+  //   exercises: 10
+  // }
+  // const part2 = {
+  //   name: 'Using props to pass data',
+  //   exercises: 7
+  // }
+  // const part3 = {
+  //   name: 'State of a component',
+  //   exercises: 14
+  // }
+
+  const course = {
+    name: 'Half Stack application development',
+    parts: [
+      {
+        name: 'Fundamentals of React',
+        exercises: 10
+      },
+      {
+        name: 'Using props to pass data',
+        exercises: 7
+      },
+      {
+        name: 'State of a component',
+        exercises: 14
+      }
+    ]
   }
 
   return (
     <div>
       <Header course={course}/>
-      <Content partsArray={[part1, part2, part3]}/>
-      <Total partsArray={[part1, part2, part3]}/>
+      <Content course={course}/>
+      <Total course={course}/>
     </div>
   )
 
@@ -34,31 +52,7 @@ const App = () => {
 function Header({course}) {
   return (
     <>
-      <h1>{course}</h1>
-    </>
-  );
-}
-
-
-function Content({partsArray}) {
-  return (
-    <>
-      <Part part={partsArray[0]}></Part>
-      <Part part={partsArray[1]}></Part>
-      <Part part={partsArray[2]}></Part>
-    </>
-  );
-}
-
-function Total({partsArray}) {
-  let totalExerciseCount = 0;
-  for (let i = 0; i < 3; i++) {
-    totalExerciseCount += partsArray[i].exercises;
-  }
-
-  return (
-    <>
-      <p>Number of exercises {totalExerciseCount}</p>
+      <h1>{course.name}</h1>
     </>
   );
 }
@@ -72,5 +66,30 @@ function Part({part}) {
     </>
   );
 }
+
+function Content({course}) {
+  return (
+    <>
+      <Part part={course.parts[0]}></Part>
+      <Part part={course.parts[1]}></Part>
+      <Part part={course.parts[2]}></Part>
+    </>
+  );
+}
+
+function Total({course}) {
+  let totalExerciseCount = 0;
+  for (let i = 0; i < course.parts.length; i++) {
+    totalExerciseCount += course.parts[i].exercises;
+  }
+
+  return (
+    <>
+      <p>Number of exercises {totalExerciseCount}</p>
+    </>
+  );
+}
+
+
 
 export default App
