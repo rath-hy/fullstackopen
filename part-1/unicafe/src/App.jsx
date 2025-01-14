@@ -13,10 +13,11 @@ const App = () => {
   const totalResponses = good + neutral + bad;
   const allStat = new Statistic("All", totalResponses);
 
-  const average = (good - bad) / totalResponses;
+  const average = Math.round(((good - bad) / totalResponses) * 100) / 100
   const averageStat = new Statistic("Average", average);
 
-  const positivePercentage = 100 * good / totalResponses;
+  const positivePercentage = Math.round((100 * good / totalResponses) * 100) / 100
+ 
   const positivePercentageStat = new Statistic("Positive", positivePercentage);
 
   const statisticsArray = [goodStat, neutralStat, badStat, allStat, averageStat, positivePercentageStat]
@@ -58,10 +59,17 @@ class Statistic {
 
 const StatisticLine = ({statistic, children}) => {
   return (
-    <div>
-      {statistic.statisticName} {statistic.value} {children}
-    </div>
+    <tr>
+      <td>{statistic.statisticName}</td>
+      <td>{"" + statistic.value} {children}</td>
+    </tr>
   );
+
+  // return (
+  //   <div>
+  //     {statistic.statisticName} {statistic.value} {children}
+  //   </div>
+  // );
 }
 
 const Statistics = ({title, statisticsArray}) => {
