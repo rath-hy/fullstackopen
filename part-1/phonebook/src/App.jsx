@@ -8,12 +8,11 @@ const App = () => {
     { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
   ])
 
-  const personsToShow = filter === '' ? persons : persons.filter(
-    individual => individual.name.toLowerCase().includes(filter.toLowerCase()))
-
   const [newName, setNewName] = useState('Elena')
   const [newNumber, setNewNumber] = useState('0')
   const [filter, setFilter] = useState('')
+
+  const personsToShow = filter === '' ? persons : persons.filter(individual => individual.name.toLowerCase().includes(filter.toLowerCase()))
 
   const handleClick = (event) => {
     event.preventDefault();
