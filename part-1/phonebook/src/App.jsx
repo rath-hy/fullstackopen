@@ -1,11 +1,6 @@
 import { useState } from 'react'
 
 const App = () => {
-  // const [persons, setPersons] = useState([
-  //   { name: 'James Bond', number: '123-456-007' }
-  // ]) 
-
-
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456', id: 1 },
     { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
@@ -13,11 +8,11 @@ const App = () => {
     { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
   ])
 
+  const personsToShow = filter === '' ? persons : persons.filter(
+    individual => individual.name.toLowerCase().includes(filter.toLowerCase()))
 
   const [newName, setNewName] = useState('Elena')
-
   const [newNumber, setNewNumber] = useState('0')
-
   const [filter, setFilter] = useState('')
 
   const handleClick = (event) => {
@@ -49,21 +44,28 @@ const App = () => {
     setFilter(event.target.value);
   }
 
-
-  const personsToShow = filter === '' ? persons : persons.filter( individual => individual.name.toLowerCase().includes(filter.toLowerCase()) )
-
   return (
     <div>
       <h2>Phonebook</h2>
-
-      {/* filter */}
-      filter shown with 
-      <input value={filter} onChange={handleFilterInputChange}/>
-
-
+      <Filter filter={filter} handleFilterInputChange={handleFilterInputChange}/>
 
       <h3>Add a new</h3>
+      <PersonForm newName={newName}
+        handleNameInputChange={handleNameInputChange}
+        newNumber={newNumber}
+        handleNumberInputChange={handleNumberInputChange}
+        handleClick={handleClick}
+      />
 
+      <h2>Numbers</h2>
+      <Persons persons={personsToShow}></Persons>
+    </div>
+  );
+}
+
+const PersonForm = ({newName, handleNameInputChange, newNumber, handleNumberInputChange, handleClick}) => {
+  return (
+    <>
       <form>
         <div>
           name: <input value={newName} onChange={handleNameInputChange}/>
@@ -77,23 +79,9 @@ const App = () => {
           <button type="submit" onClick={handleClick}>add</button>
         </div>
       </form>
-
-
-      <h2>Numbers</h2>
-      <Persons persons={personsToShow}></Persons>
-    </div>
-  );
-}
-
-// are the outside tags necessary?
-const PersonForm = () => {
-  return (
-    <>
-
     </>
   );
 }
-
 
 const Persons = ({persons = [{}]}) => {
   return (
@@ -114,19 +102,14 @@ const Persons = ({persons = [{}]}) => {
   );
 }
 
-
-
-
-const Filter = () => {
+const Filter = ({filter, handleFilterInputChange}) => {
   return (
     <>
-
+      filter shown with 
+      <input value={filter} onChange={handleFilterInputChange}/>
     </>
   );
 }
-
-
-
 
 function areTheseObjectsEqual(first, second) {
   "use strict";
