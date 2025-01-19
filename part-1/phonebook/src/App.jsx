@@ -7,9 +7,6 @@ const App = () => {
   const [persons, setPersons] = useState([])
 
   useEffect(() => {
-    // axios
-    //   .get('http://localhost:3001/persons')
-
     phonebookService
       .getAll()
       .then((response) => {
@@ -25,42 +22,54 @@ const App = () => {
 
 
   const deletePerson = (person) => {
-
     if (window.confirm(`Are you sure you want to delete ${person.name}?`))
     phonebookService
       .remove(person.id)
       .then( () => {
         setPersons(persons.filter( thisPerson => thisPerson.id !== person.id) )
       })
-
   }
 
+  const samePerson = (personA, personB) => {
+    return ((personA.name.toLowerCase() === personB.name.toLowerCase())
+      && (personA.number === personB.number)
+    );
+  }
 
   const handleClick = (event) => {
     event.preventDefault();
-    const newPerson = { name: newName, number: newNumber};
+    const newPerson = {name: newName, number: newNumber};
 
-    if (persons.some((person) => areTheseObjectsEqual(person, newPerson))) {
+    //same name (case insensitive) AND same number
+    if (persons.some((thisPerson) => samePerson(thisPerson, newPerson))) {
       window.alert(`${newPerson.name} already exists!`);
     }
 
     else {
+      //same name but different number
+      const existingPerson = persons.find(thisPerson => thisPerson.name.toLowerCase() === newPerson.name.toLowerCase());
 
-      // axios
-      //   .post('http://localhost:3001/persons', newPerson)
+      if (existingPerson) {
+        if (window.confirm(`${existingPerson.name} is already added to the phonebook. Replace old number with new one?`)) {
+          phonebookService
+            .update(existingPerson.id, newPerson)
+            .then(response => {
+              setPersons(persons.map(person => person.id === existingPerson.id ? response.data : person))
+            })
+          setNewName('');
+          setNewNumber('');
+        }
+      } 
 
-      phonebookService
+      else {
+        phonebookService
         .create(newPerson)
         .then(response => {
           setPersons(persons.concat(response.data));
           setNewName('');
           setNewNumber('');
         })
-
-
-      // setPersons(persons.concat(newPerson));
-      // setNewName('');
-      // setNewNumber('');
+      }
     }
   }
 
@@ -122,7 +131,7 @@ const Persons = ({persons = [{}], deletePerson}) => {
     <table>
       <tbody>
       {persons.map(person => 
-        <tr key={person.name}>
+        <tr key={person.id}>
           <td>
           {person.name}
           </td>
@@ -151,51 +160,51 @@ const Filter = ({filter, handleFilterInputChange}) => {
   );
 }
 
-function areTheseObjectsEqual(first, second) {
-  "use strict";
+// function areTheseObjectsEqual(first, second) {
+//   "use strict";
 
-  if (
-    first === null ||
-    first === undefined ||
-    second === null ||
-    second === undefined
-  ) {
-    return first === second;
-  }
+//   if (
+//     first === null ||
+//     first === undefined ||
+//     second === null ||
+//     second === undefined
+//   ) {
+//     return first === second;
+//   }
 
-  if (first.constructor !== second.constructor) {
-    return false;
-  }
+//   if (first.constructor !== second.constructor) {
+//     return false;
+//   }
 
-  if (first instanceof Function || first instanceof RegExp) {
-    return first === second;
-  }
+//   if (first instanceof Function || first instanceof RegExp) {
+//     return first === second;
+//   }
 
-  if (first === second || first.valueOf() === second.valueOf()) {
-    return true;
-  }
+//   if (first === second || first.valueOf() === second.valueOf()) {
+//     return true;
+//   }
 
-  if (first instanceof Date) return false;
+//   if (first instanceof Date) return false;
 
-  if (Array.isArray(first) && first.length !== second.length) {
-    return false;
-  }
+//   if (Array.isArray(first) && first.length !== second.length) {
+//     return false;
+//   }
 
-  if (!(first instanceof Object) || !(second instanceof Object)) {
-    return false;
-  }
+//   if (!(first instanceof Object) || !(second instanceof Object)) {
+//     return false;
+//   }
 
-  const firstKeys = Object.keys(first);
+//   const firstKeys = Object.keys(first);
 
-  const allKeysExist = Object.keys(second).every(
-    (i) => firstKeys.indexOf(i) !== -1
-  );
+//   const allKeysExist = Object.keys(second).every(
+//     (i) => firstKeys.indexOf(i) !== -1
+//   );
 
-  const allKeyValuesMatch = firstKeys.every((i) =>
-    areTheseObjectsEqual(first[i], second[i])
-  );
+//   const allKeyValuesMatch = firstKeys.every((i) =>
+//     areTheseObjectsEqual(first[i], second[i])
+//   );
 
-  return allKeysExist && allKeyValuesMatch;
-}
+//   return allKeysExist && allKeyValuesMatch;
+// }
 
 export default App
