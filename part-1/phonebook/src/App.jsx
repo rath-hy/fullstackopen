@@ -18,6 +18,20 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('0')
   const [filter, setFilter] = useState('')
 
+
+  const [message, setMessage] = useState(null)
+
+
+  const successsMessageStyle = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  }
+
   const personsToShow = filter === '' ? persons : persons.filter(individual => individual.name.toLowerCase().includes(filter.toLowerCase()))
 
 
@@ -69,6 +83,9 @@ const App = () => {
           setNewName('');
           setNewNumber('');
         })
+
+        setMessage(`${newPerson.name} successfully added.`);
+        setTimeout(() => {setMessage(null)}, 1000);
       }
     }
   }
@@ -89,6 +106,10 @@ const App = () => {
 
   return (
     <div>
+      {/* messageType might be redundant lmao */}
+      <Notification message={message} messageType="success" messageStyle={successsMessageStyle}/>
+
+
       <h2>Phonebook</h2>
       <Filter filter={filter} handleFilterInputChange={handleFilterInputChange}/>
 
@@ -206,5 +227,17 @@ const Filter = ({filter, handleFilterInputChange}) => {
 
 //   return allKeysExist && allKeyValuesMatch;
 // }
+
+const Notification = ({message, messageType, messageStyle}) => {
+  if (message === null) {
+    return null;
+  }
+
+  return (
+    <div className={messageType} style={messageStyle}>
+      {message}
+    </div>
+  );
+}
 
 export default App
