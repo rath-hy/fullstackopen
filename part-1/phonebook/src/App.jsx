@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import phonebookService from './services/phonebook'
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+    // axios
+    //   .get('http://localhost:3001/persons')
+
+    phonebookService
+      .getAll()
       .then((response) => {
         setPersons(response.data)
       })
@@ -28,8 +33,11 @@ const App = () => {
 
     else {
 
-      axios
-        .post('http://localhost:3001/persons', newPerson)
+      // axios
+      //   .post('http://localhost:3001/persons', newPerson)
+
+      phonebookService
+        .create(newPerson)
         .then(response => {
           console.log(response);
           setPersons(persons.concat(response.data));
