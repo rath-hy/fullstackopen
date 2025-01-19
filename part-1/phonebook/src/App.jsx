@@ -23,6 +23,19 @@ const App = () => {
 
   const personsToShow = filter === '' ? persons : persons.filter(individual => individual.name.toLowerCase().includes(filter.toLowerCase()))
 
+
+  const deletePerson = (person) => {
+
+    if (window.confirm(`Are you sure you want to delete ${person.name}?`))
+    phonebookService
+      .remove(person.id)
+      .then( () => {
+        setPersons(persons.filter( thisPerson => thisPerson.id !== person.id) )
+      })
+
+  }
+
+
   const handleClick = (event) => {
     event.preventDefault();
     const newPerson = { name: newName, number: newNumber};
@@ -39,7 +52,6 @@ const App = () => {
       phonebookService
         .create(newPerson)
         .then(response => {
-          console.log(response);
           setPersons(persons.concat(response.data));
           setNewName('');
           setNewNumber('');
@@ -80,7 +92,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons persons={personsToShow}></Persons>
+      <Persons persons={personsToShow} deletePerson={deletePerson}></Persons>
     </div>
   );
 }
@@ -105,7 +117,7 @@ const PersonForm = ({newName, handleNameInputChange, newNumber, handleNumberInpu
   );
 }
 
-const Persons = ({persons = [{}]}) => {
+const Persons = ({persons = [{}], deletePerson}) => {
   return (
     <table>
       <tbody>
@@ -118,6 +130,12 @@ const Persons = ({persons = [{}]}) => {
           <td>
           {person.number}
           </td>
+
+          <td>
+            <button onClick={() => deletePerson(person)}>Delete</button>
+          </td>
+
+
         </tr>)}
       </tbody>
     </table>
