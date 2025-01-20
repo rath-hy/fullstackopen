@@ -32,6 +32,19 @@ const App = () => {
     marginBottom: 10,
   }
 
+  const failureMessageStyle = {
+    color: 'red',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  }
+
+  const [messageStyle, setMessageStyle] = useState(successsMessageStyle);
+
+
   const personsToShow = filter === '' ? persons : persons.filter(individual => individual.name.toLowerCase().includes(filter.toLowerCase()))
 
 
@@ -66,6 +79,7 @@ const App = () => {
       if (existingPerson) {
         if (window.confirm(`${existingPerson.name} is already added to the phonebook. Replace old number with new one?`)) {
           
+          setMessageStyle(successsMessageStyle);
           setMessage(`${newPerson.name}'s number successfully changed.`);
           setTimeout(() => {setMessage(null)}, 1200);
 
@@ -75,6 +89,12 @@ const App = () => {
             .then(response => {
               setPersons(persons.map(person => person.id === existingPerson.id ? response.data : person))
             })
+            .catch(error => {
+              setMessageStyle(failureMessageStyle);
+              setMessage(`${existingPerson.name} does not exist.`);
+              setTimeout(() => {setMessage(null)}, 3000);
+            })
+
           setNewName('');
           setNewNumber('');
         }
@@ -112,7 +132,7 @@ const App = () => {
   return (
     <div>
       {/* messageType might be redundant lmao */}
-      <Notification message={message} messageType="success" messageStyle={successsMessageStyle}/>
+      <Notification message={message} messageStyle={messageStyle}/>
 
 
       <h2>Phonebook</h2>
