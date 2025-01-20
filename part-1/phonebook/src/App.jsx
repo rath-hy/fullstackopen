@@ -65,6 +65,11 @@ const App = () => {
 
       if (existingPerson) {
         if (window.confirm(`${existingPerson.name} is already added to the phonebook. Replace old number with new one?`)) {
+          
+          setMessage(`${newPerson.name}'s number successfully changed.`);
+          setTimeout(() => {setMessage(null)}, 1200);
+
+
           phonebookService
             .update(existingPerson.id, newPerson)
             .then(response => {
@@ -85,7 +90,7 @@ const App = () => {
         })
 
         setMessage(`${newPerson.name} successfully added.`);
-        setTimeout(() => {setMessage(null)}, 1000);
+        setTimeout(() => {setMessage(null)}, 1200);
       }
     }
   }
