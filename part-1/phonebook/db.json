@@ -1,34 +1,19 @@
 {
   "persons": [
     {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": "1"
+      "id": "263c",
+      "name": "Abacus",
+      "number": "626 481 255"
     },
     {
-      "id": "8666",
+      "name": "Bacon",
+      "number": "123",
+      "id": "9557"
+    },
+    {
+      "id": "ad77",
       "name": "Elena",
-      "number": "0"
-    },
-    {
-      "id": "e734",
-      "name": "Dog",
-      "number": "123"
-    },
-    {
-      "id": "53f5",
-      "name": "Doggo",
-      "number": "1"
-    },
-    {
-      "id": "f7e8",
-      "name": "Elenasdfsd",
-      "number": "0123123"
-    },
-    {
-      "id": "1768",
-      "name": "Elena12",
-      "number": "0"
+      "number": "81-232-231"
     }
   ]
 }
