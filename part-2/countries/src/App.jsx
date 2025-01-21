@@ -24,54 +24,67 @@ function App() {
       })
   }, []); //reads in data for all countries once and never again
 
+  //idea -- countriesToShow should contain all country data, not just their names
   useEffect(() => {
     if (data && inputValue) {
       const countriesShowable = data
         .filter(countryData => countryData.name.common.toLowerCase().includes(inputValue.toLowerCase()))
-        .map(countryData => 
-          <div key={countryData.name.common}>
-            {countryData.name.common}
-          </div>)
-        
+
       setCountriesToShow(countriesShowable);
     } else {
       setCountriesToShow(null);
     }
-  }, [inputValue]); //checks on countriesToShow every time input changes
+  }, [data, inputValue]); //checks on countriesToShow every time input or data changes (in case data 
+                          //is populated after input is typed)
 
   useEffect(() => {
     if (countriesToShow && countriesToShow.length === 1) {
       axios
-        .get(`${baseUrl}/name/${countriesToShow[0].props.children}`) //countriesToShow is a list of <div>content</div>
+        .get(`${baseUrl}/name/${countriesToShow[0].name.common}`) //countriesToShow is a list of <div>content</div>
         .then(response => setCountry(response.data))
     } else {
       setCountry(null);
     }
   }, [countriesToShow]) 
 
+  //might need a meta function
+  const handleShow = (countryClickedOn) => {
+    setCountriesToShow([countryClickedOn]); //shouldn't be necessary but okay
+    setCountry(countryClickedOn);
+  }
+
   return (
     <div>
       Find countries
       <input value={inputValue} onChange={handleInputChange}/>
 
-      <CountryList countriesToShow={countriesToShow} country={country}/>
+      <CountryList countriesToShow={countriesToShow} country={country} handleShow={handleShow}/>
     </div>
   )
 }
 
 //can use components to make the request function simpler
-const CountryList = ({countriesToShow, country}) => {
+const CountryList = ({countriesToShow, country, handleShow}) => {
   if (countriesToShow === null) {
     return null;
   }
 
+  //something is wrong with this -- only after backspace does it owrk
   if (countriesToShow.length > 10)
     return <div>Too many matches; please specify another filter.</div>;
 
-  if (countriesToShow.length > 1)
-    return <div>{countriesToShow}</div>;
+  const countriesToShowWithButtons = countriesToShow.map( (country, index) => 
+    <div key={countriesToShow[index].name.official}>
+      {country.name.common}
+      <button onClick={() => handleShow(country)}>Show</button>
+    </div>
+  )
 
-  if (countriesToShow.length === 1 && country !== null) {
+  if (countriesToShow.length > 1)
+    return <div>{countriesToShowWithButtons}</div>;
+
+
+  if (country !== null) {
     const languagesArray = Object.values(country.languages)
     const languageCodesArray = Object.keys(country.languages)
 
