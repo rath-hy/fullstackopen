@@ -106,10 +106,17 @@ const App = () => {
           setPersons(persons.concat(response.data));
           setNewName('');
           setNewNumber('');
+          
+          setMessageStyle(successsMessageStyle)
+          setMessage(`${newPerson.name} successfully added.`);
+          setTimeout(() => {setMessage(null)}, 1200);
         })
-
-        setMessage(`${newPerson.name} successfully added.`);
-        setTimeout(() => {setMessage(null)}, 1200);
+        .catch(error => {
+          const errorMessage = error.response.data.error
+          setMessageStyle(failureMessageStyle);
+          setMessage(errorMessage);
+          setTimeout(() => {setMessage(null)}, 1200);
+        })
       }
     }
   }
