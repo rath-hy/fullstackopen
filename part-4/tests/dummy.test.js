@@ -60,7 +60,8 @@ const listWithManyBlogs = [
   }  
 ]
 
-listHelper.mostBlog(listWithManyBlogs);
+// listHelper.mostBlog(listWithManyBlogs);
+console.log(listHelper.mostLikes(listWithManyBlogs))
 
 describe('total likes', () => {
 
@@ -106,7 +107,15 @@ describe('harder tests', () => {
     const mostBlogs = listHelper.mostBlog(listWithManyBlogs)
     assert.deepStrictEqual(mostBlogs, {
       author: "Robert C. Martin",
-      blogs: 3
+      blogs: 3,
+    })
+  })
+
+  test('most likes', () => {
+    const mostLikes = listHelper.mostLikes(listWithManyBlogs)
+    assert.deepStrictEqual(mostLikes, {
+      author: "Edsger W. Dijkstra",
+      likes: 12,
     })
   })
 })
