@@ -99,6 +99,28 @@ test.only('if title or url missing, 400', async () => {
     .expect(400)
 })
 
+
+test.only('succeeds with 204 if error is valid', async () => {
+  const validId = initialBlogs[0]._id
+
+  await api
+    .delete(`/api/blogs/${validId}`)
+    .expect(204)
+}) 
+
+test.only('eror 400 if invalid id', async () => {
+  const invalidId = "123"
+  await api
+    .delete(`/api/blogs/${invalidId}`)
+    .expect(400)
+})
+
+
+
+
+
+
+
 const initialBlogs = [
     {
       _id: "5a422a851b54a676234d17f7",
