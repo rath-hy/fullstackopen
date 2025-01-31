@@ -4,7 +4,6 @@ const listHelper = require('../utils/list_helper')
 
 test('dummy returns one', () => {
   const blogs = []
-
   const result = listHelper.dummy(blogs)
   assert.strictEqual(result, 1)
 })
@@ -60,13 +59,8 @@ const listWithManyBlogs = [
   }  
 ]
 
-// listHelper.mostBlog(listWithManyBlogs);
-console.log(listHelper.mostLikes(listWithManyBlogs))
-
 describe('total likes', () => {
-
   const listWithNoBlogs = []
-
   const listWithOneBlog = [
     {
       _id: '5a422aa71b54a676234d17f8',
@@ -77,8 +71,6 @@ describe('total likes', () => {
       __v: 0
     }
   ]
-
-  
 
   test('of empty list is zero', () => {
     const result = listHelper.totalLikes(listWithNoBlogs)
