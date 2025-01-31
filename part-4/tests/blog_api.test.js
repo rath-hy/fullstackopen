@@ -115,6 +115,22 @@ test.only('eror 400 if invalid id', async () => {
     .expect(400)
 })
 
+test.only('updating note is possible', async () => {
+
+  const updatedBlog = {
+    id: "5a422a851b54a676234d17f7",
+    likes: 70,
+  }
+
+  const response = await api
+    .put(`/api/blogs/${updatedBlog.id}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  
+  assert.strictEqual(response.body.likes, updatedBlog.likes)
+})
+
 
 
 
