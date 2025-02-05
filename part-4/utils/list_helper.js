@@ -33,6 +33,7 @@ const mostBlog = (listOfBlogs) => {
     const mostBlogs = _.maxBy(authorsAndBlogCount, blog => blog.blogs)
     return mostBlogs;
 }
+
 const mostLikes = (listOfBlogs) => {
     const hasMostLikes = _.maxBy(listOfBlogs, blog => blog.likes)
     const formattedResponse = {author: hasMostLikes.author, likes: hasMostLikes.likes}
