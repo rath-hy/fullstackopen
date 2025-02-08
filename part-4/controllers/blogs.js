@@ -3,8 +3,9 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const mongoose = require('mongoose')
-const { info } = require('../utils/logger')
+// const { info } = require('../utils/logger')
 const jwt = require('jsonwebtoken')
+const middleware = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog
@@ -23,14 +24,9 @@ blogsRouter.get('/gets/', (request, response) => {
     })
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     const body = request.body
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
-      return response.status(400).json({ error: 'token invalid' })
-    }
-
-    const user = await User.findById(decodedToken.id)
+    const user = request.user
 
     const blog = new Blog({
       ...body,
@@ -60,7 +56,7 @@ blogsRouter.post('/', async (request, response) => {
  4. compare users from parts 2 and 3
 */
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
   const id = request.params.id
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -73,17 +69,15 @@ blogsRouter.delete('/:id', async (request, response) => {
     return response.status(404).json({ error: 'Blog post not found' });
   }
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  // const decodedToken = jwt.verify(request.token, process.env.SECRET)
 
-  if (!decodedToken.id) {
-    return response.status(400).json({ error: 'token invalid' })
-  }
+  // if (!decodedToken.id) {
+  //   return response.status(400).json({ error: 'token invalid' })
+  // }
 
-  if (blogToDelete.user.toString() === decodedToken.id) {
-    console.log('*** blogToDelete.user', blogToDelete.user.toString())
-    console.log('*** decodedToken.id', decodedToken.id)
-
-    const deletedBlog = await Blog.findByIdAndDelete(id)
+  // if (blogToDelete.user.toString() === decodedToken.id.toString()) {
+  if (blogToDelete.user.toString() === request.user.id) {
+    await Blog.findByIdAndDelete(id)
   }
 
   return response.status(204).end();
