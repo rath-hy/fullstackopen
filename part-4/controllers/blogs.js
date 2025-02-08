@@ -4,6 +4,15 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const mongoose = require('mongoose')
 const { info } = require('../utils/logger')
+const jwt = require('jsonwebtoken')
+
+const getTokenFrom = response => {
+  const authorization = response.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
 
 
 blogsRouter.get('/', async (request, response) => {
@@ -39,9 +48,12 @@ blogsRouter.get('/gets/', (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
     const body = request.body
-    // console.log("***here's the body:", body)
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(400).json({ error: 'token invalid' })
+    }
 
-    const user = await User.findById(body.userId)
+    const user = await User.findById(decodedToken.id)
 
     const blog = new Blog({
       ...body,
