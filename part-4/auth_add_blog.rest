@@ -3,9 +3,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InB1dGh5cmF0aHkiLCJpZCI6IjY3YTZhNTQ2ZDIzMGNhYjQyMmZkYzBjZCIsImlhdCI6MTczODk4MDk0OX0.JLox8MWLvo3IdB_i_eXxGOC9I3Dc7U1OuMAfpRyciuM
 
 {
-    "title": "Why I want to marry Rath",
-    "author": "Gina Kehr",
-    "url": "iloveyou.com",
-    "likes": 69,
-    "userId": "67a3e7b8e966575c08b683ae"
+    "title": "This is a post I just added, and plan to delete",
+    "author": "Puthyrath Hy",
+    "url": "random-ass-website.com",
+    "likes": 900,
+    "userId": "67a6a546d230cab422fdc0cd"
 }
