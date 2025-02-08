@@ -51,6 +51,15 @@ blogsRouter.post('/', async (request, response) => {
     response.status(201).json(savedBlog)
 })
 
+//deleting a blog is possible only if the token sent with the request is the same as that of the blog's creator.
+
+/* 
+ 1. with the delete link, find id of the blog to delete
+ 2. from the found blog, find its user
+ 3. from the token, find the user
+ 4. compare users from parts 2 and 3
+*/
+
 blogsRouter.delete('/:id', async (request, response) => {
   const id = request.params.id
 
@@ -58,10 +67,23 @@ blogsRouter.delete('/:id', async (request, response) => {
     return response.status(400).json({ error: 'Invalid ID format' });
   }
 
-  const deletedBlog = await Blog.findByIdAndDelete(id)
+  const blogToDelete = await Blog.findById(id)
 
-  if (!deletedBlog) {
+  if (!blogToDelete) {
     return response.status(404).json({ error: 'Blog post not found' });
+  }
+
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+  if (!decodedToken.id) {
+    return response.status(400).json({ error: 'token invalid' })
+  }
+
+  if (blogToDelete.user.toString() === decodedToken.id) {
+    console.log('*** blogToDelete.user', blogToDelete.user.toString())
+    console.log('*** decodedToken.id', decodedToken.id)
+
+    const deletedBlog = await Blog.findByIdAndDelete(id)
   }
 
   return response.status(204).end();
