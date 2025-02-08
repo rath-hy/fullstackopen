@@ -2,8 +2,9 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "I really hope this works",
-    "author": "Rath Hy",
-    "url": "yourmom.com",
-    "likes": 8
+    "title": "Why I love Rath so much",
+    "author": "Gina Kehr",
+    "url": "iloveyou.com",
+    "likes": 31,
+    "userId": "67a3e7b8e966575c08b683ae"
 }
