@@ -6,15 +6,6 @@ const mongoose = require('mongoose')
 const { info } = require('../utils/logger')
 const jwt = require('jsonwebtoken')
 
-const getTokenFrom = response => {
-  const authorization = response.get('authorization')
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
-
-
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog
       .find({})
@@ -32,23 +23,9 @@ blogsRouter.get('/gets/', (request, response) => {
     })
 })
 
-// const blogSchema = new mongoose.Schema({
-//   url: String,
-//   title: String,
-//   author: String,
-//   user: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: 'User'
-//   },
-//   likes: {
-//     type: Number,
-//     default: 0,
-//   },
-// })
-
 blogsRouter.post('/', async (request, response) => {
     const body = request.body
-    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
     if (!decodedToken.id) {
       return response.status(400).json({ error: 'token invalid' })
     }
