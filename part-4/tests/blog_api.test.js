@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 const api = supertest(app);
 
 const initialBlogs = [
@@ -57,11 +58,40 @@ const initialBlogs = [
   },
 ];
 
+let token;
+let arbitraryUser;
+let arbitraryUserAdditionResponse;
+let arbitraryLoginInfoReturned;
+
 beforeEach(async () => {
+  await User.deleteMany({})
   await Blog.deleteMany({});
   const blogObjects = initialBlogs.map((blog) => new Blog(blog));
   const promiseArray = blogObjects.map((blog) => blog.save());
   await Promise.all(promiseArray);
+
+  arbitraryUser = {
+    username: 'guyfawkes',
+    name: 'Guy Fawkes',
+    password: 'parliament69',
+  };
+
+  arbitraryUserAdditionResponse = await api
+    .post('/api/users')
+    .send(arbitraryUser)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  arbitraryLoginInfoReturned = await api
+    .post('/api/login')
+    .send({
+      username: arbitraryUser.username,
+      password: arbitraryUser.password,
+    })
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  token = arbitraryLoginInfoReturned.body.token;
 });
 
 describe('when there are some notes saved initially', () => {
@@ -90,15 +120,17 @@ describe('when there are some notes saved initially', () => {
 
   describe('note creation', () => {
     test('succeeds with valid data', async () => {
+
       const newBlogPost = {
         title: 'How to make fried rice',
         author: 'Bok Choy',
         url: 'https://friedrice.com/',
         likes: 20,
       };
-
+      
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlogPost)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -117,6 +149,7 @@ describe('when there are some notes saved initially', () => {
 
       const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlogPost)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -128,28 +161,78 @@ describe('when there are some notes saved initially', () => {
       const blogWithoutTitle = {
         author: 'Cole Galvan',
         url: 'https://cgalvan.com',
+        userId: "67a7c324f5dbc41e99f47a71"
       };
 
       const blogWithoutUrl = {
         title: "Why I'm so popular",
         author: 'Gina Kehr',
+        userId: "67a7c324f5dbc41e99f47a71"
       };
 
-      await api.post('/api/blogs').send(blogWithoutTitle).expect(400);
-      await api.post('/api/blogs').send(blogWithoutUrl).expect(400);
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(blogWithoutTitle)
+        .expect(400);
+      
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(blogWithoutUrl)
+        .expect(400);
     });
+
+
+    test('if token not provided, 401', async () => {
+      const arbitraryBlogPost = {
+        title: 'i exist to be deleted',
+        author: 'kill me please',
+        url: 'https://iwanttodisappear.com/',
+        likes: 0,
+      };
+      
+      const arbitraryBlogPostResponse = await api
+        .post('/api/blogs')
+        // .set('Authorization', `Bearer ${token}`)
+        .send(arbitraryBlogPost)
+        .expect(401)
+        // .expect('Content-Type', /application\/json/);
+
+    })
   });
 
   describe('note deletion', () => {
     test('succeeds with 204 if id is valid', async () => {
-      const validId = initialBlogs[0]._id;
 
-      await api.delete(`/api/blogs/${validId}`).expect(204);
+      const arbitraryBlogPost = {
+        title: 'i exist to be deleted',
+        author: 'kill me please',
+        url: 'https://iwanttodisappear.com/',
+        likes: 0,
+      };
+      
+      const arbitraryBlogPostResponse = await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(arbitraryBlogPost)
+        .expect(201)
+        .expect('Content-Type', /application\/json/);
+
+      const validId = arbitraryBlogPostResponse.body.id
+      
+      await api
+        .delete(`/api/blogs/${validId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204);
     });
 
     test('error 400 if invalid id', async () => {
       const invalidId = '123';
-      await api.delete(`/api/blogs/${invalidId}`).expect(400);
+      await api
+        .delete(`/api/blogs/${invalidId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(400);
     });
   });
 
