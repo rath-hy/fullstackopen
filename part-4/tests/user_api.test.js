@@ -33,5 +33,4 @@ test('invalid users are not created', async () => {
         .send(userWithTooShortPassword)
         .expect(400)
 
-    console.log('hey this was run ****')
 })
