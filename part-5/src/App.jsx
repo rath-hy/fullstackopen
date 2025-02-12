@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
+
 import blogService from './services/blogs'
-
 import loginService from './services/login'
-
 
 
 const App = () => {
@@ -13,31 +13,45 @@ const App = () => {
   
   const [user, setUser] = useState(null)
 
-
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationType, setNotificationType] = useState(null)
+
   const handleCreateNewBlog = async () => {
     event.preventDefault()
 
-    const newBlog = {
-      url,
-      title,
-      author
+    try {
+      const newBlog = {
+        url,
+        title,
+        author
+      }
+  
+      const response = await blogService.create(newBlog)
+      setBlogs([...blogs, response])
+
+      const successfulBlogAdditionMessage = `A new blog "${title}" by ${author} added`
+  
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+
+      setNotificationType('success')
+      setNotificationMessage(successfulBlogAdditionMessage)
+      setTimeout(() => {setNotificationMessage(null)}, 1500)
+
+    } catch (exception) {
+      setNotificationType('error')
+      setNotificationMessage('Blog addition failed.')
+      setTimeout(() => {setNotificationMessage(null)}, 1500)
     }
-
-    const response = await blogService.create(newBlog)
-    setBlogs([...blogs, response])
-
-    setTitle('')
-    setAuthor('')
-    setUrl('')
   }
 
   const newBlogForm = () => (
     <form onSubmit={handleCreateNewBlog}> 
-
       <div>
         Title 
         <input 
@@ -46,7 +60,6 @@ const App = () => {
           name="Title"
           onChange={ ({target}) => setTitle(target.value)  }
         />
-
       </div>
         Author
           <input 
@@ -55,7 +68,6 @@ const App = () => {
             name="Author"
             onChange={ ({target}) => setAuthor(target.value)  }
           />
-
       <div>
         Url
           <input 
@@ -65,15 +77,38 @@ const App = () => {
             onChange={ ({target}) => setUrl(target.value)  }
           />
       </div>
-
-
       <div>
         <button type="submit">submit</button>
-  
       </div>
-
     </form>
   )
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+
+    try {
+      const user = await loginService.login({ username, password })
+
+      window.localStorage.setItem(
+        'loggedInBlogAppUser', JSON.stringify(user)
+      )
+
+      blogService.setToken(user.token)
+
+      setUser(user)
+      setUsername('')
+      setPassword('')
+
+      setNotificationType('success')
+      setNotificationMessage('successfully logged in')
+      setTimeout(() => {setNotificationMessage(null)}, 1500)
+
+    } catch (exception) {
+      setNotificationType('error')
+      setNotificationMessage('invalid username or password')
+      setTimeout(() => {setNotificationMessage(null)}, 1500)
+    }
+  }
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -118,29 +153,6 @@ const App = () => {
     <button type="submit" onClick={logout}>Log Out</button>
   )
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
-    try {
-      const user = await loginService.login({ username, password })
-
-      window.localStorage.setItem(
-        'loggedInBlogAppUser', JSON.stringify(user)
-      )
-
-
-      blogService.setToken(user.token)
-
-      setUser(user)
-      setUsername('')
-      setPassword('')
-    } catch (exception) {
-      //error message stuff
-    }
-
-    console.log('Logging in with', username, password)
-  }
-
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -160,6 +172,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification type={notificationType} message={notificationMessage}/>
       {
         user === null ?
           <div>
