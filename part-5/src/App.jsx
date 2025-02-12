@@ -13,6 +13,68 @@ const App = () => {
   
   const [user, setUser] = useState(null)
 
+
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const handleCreateNewBlog = async () => {
+    event.preventDefault()
+
+    const newBlog = {
+      url,
+      title,
+      author
+    }
+
+    const response = await blogService.create(newBlog)
+    setBlogs([...blogs, response])
+
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+  }
+
+  const newBlogForm = () => (
+    <form onSubmit={handleCreateNewBlog}> 
+
+      <div>
+        Title 
+        <input 
+          type="text" 
+          value={title}
+          name="Title"
+          onChange={ ({target}) => setTitle(target.value)  }
+        />
+
+      </div>
+        Author
+          <input 
+            type="text" 
+            value={author}
+            name="Author"
+            onChange={ ({target}) => setAuthor(target.value)  }
+          />
+
+      <div>
+        Url
+          <input 
+            type="text" 
+            value={url}
+            name="Url"
+            onChange={ ({target}) => setUrl(target.value)  }
+          />
+      </div>
+
+
+      <div>
+        <button type="submit">submit</button>
+  
+      </div>
+
+    </form>
+  )
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
     <div>
@@ -68,6 +130,7 @@ const App = () => {
 
 
       blogService.setToken(user.token)
+
       setUser(user)
       setUsername('')
       setPassword('')
@@ -106,32 +169,13 @@ const App = () => {
            :
           <div>
               <p>{user.name} logged in {logoutButton()}</p>
+              {newBlogForm()}
+              <br/>
               {blogsList()}
           </div>
       }
     </div>
   )
-
-
-
-  // if (user === null) {
-  //   return (
-  //   <div>
-  //     <h2>Login</h2>
-  //     {loginForm()}
-  //   </div>
-  //   )
-  // }
-
-  // // console.log('user2', user)
-
-  // return (
-  //   <div>
-  //     <h2>blogs</h2>
-  //      {user.name} logged in
-  //     {blogsList()}
-  //   </div>
-  // )
 }
 
 export default App
