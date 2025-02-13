@@ -5,6 +5,48 @@ import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+const NewBlogForm = ({
+  handleSubmit,
+  handleTitleChange,
+  handleAuthorChange,
+  handleUrlChange,
+  title,
+  author,
+  url
+}) => {
+  return (
+    <div>
+        <form onSubmit={handleSubmit}> 
+        <div>
+          Title 
+          <input 
+            type="text" 
+            value={title}
+            name="Title"
+            onChange={handleTitleChange}
+          />
+        </div>
+          Author
+            <input 
+              type="text" 
+              value={author}
+              name="Author"
+              onChange={handleAuthorChange}
+            />
+        <div>
+          Url
+            <input 
+              type="text" 
+              value={url}
+              name="Url"
+              onChange={handleUrlChange}
+            />
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </div>
+  )
+}
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -19,6 +61,9 @@ const App = () => {
 
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
+
+
+  const [newBlogFormVisible, setNewBlogFormVisible] = useState(false)
 
   const handleCreateNewBlog = async () => {
     event.preventDefault()
@@ -43,6 +88,8 @@ const App = () => {
       setNotificationMessage(successfulBlogAdditionMessage)
       setTimeout(() => {setNotificationMessage(null)}, 1500)
 
+      setNewBlogFormVisible(false)
+
     } catch (exception) {
       setNotificationType('error')
       setNotificationMessage('Blog addition failed.')
@@ -50,38 +97,33 @@ const App = () => {
     }
   }
 
-  const newBlogForm = () => (
-    <form onSubmit={handleCreateNewBlog}> 
+
+
+  const newBlogForm = () => {
+    const hideWhenVisible = { display : newBlogFormVisible ? 'none' : '' }
+    const showWhenVisible = { display : newBlogFormVisible ? '' : 'none' }
+
+    return (
       <div>
-        Title 
-        <input 
-          type="text" 
-          value={title}
-          name="Title"
-          onChange={ ({target}) => setTitle(target.value)  }
-        />
+        <div style={showWhenVisible}>
+          <NewBlogForm 
+              handleSubmit={handleCreateNewBlog}
+              handleTitleChange={({target}) => setTitle(target.value)}
+              handleAuthorChange={({target}) => setAuthor(target.value)}
+              handleUrlChange={({target}) => setUrl(target.value)}
+              title={title}
+              author={author}
+              url={url}/>
+        </div>
+        <button style={hideWhenVisible} onClick={() => setNewBlogFormVisible(true) }>new note</button>
+        <button style={showWhenVisible} onClick={() => setNewBlogFormVisible(false)}>cancel</button>
       </div>
-        Author
-          <input 
-            type="text" 
-            value={author}
-            name="Author"
-            onChange={ ({target}) => setAuthor(target.value)  }
-          />
-      <div>
-        Url
-          <input 
-            type="text" 
-            value={url}
-            name="Url"
-            onChange={ ({target}) => setUrl(target.value)  }
-          />
-      </div>
-      <div>
-        <button type="submit">submit</button>
-      </div>
-    </form>
-  )
+
+    )
+  }
+    
+    
+
 
   const handleLogin = async (event) => {
     event.preventDefault()
