@@ -1,52 +1,11 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
 
-const NewBlogForm = ({
-  handleSubmit,
-  handleTitleChange,
-  handleAuthorChange,
-  handleUrlChange,
-  title,
-  author,
-  url
-}) => {
-  return (
-    <div>
-        <form onSubmit={handleSubmit}> 
-        <div>
-          Title 
-          <input 
-            type="text" 
-            value={title}
-            name="Title"
-            onChange={handleTitleChange}
-          />
-        </div>
-          Author
-            <input 
-              type="text" 
-              value={author}
-              name="Author"
-              onChange={handleAuthorChange}
-            />
-        <div>
-          Url
-            <input 
-              type="text" 
-              value={url}
-              name="Url"
-              onChange={handleUrlChange}
-            />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-  )
-}
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -55,9 +14,7 @@ const App = () => {
   
   const [user, setUser] = useState(null)
 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+
 
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
@@ -106,19 +63,11 @@ const App = () => {
     return (
       <div>
         <div style={showWhenVisible}>
-          <NewBlogForm 
-              handleSubmit={handleCreateNewBlog}
-              handleTitleChange={({target}) => setTitle(target.value)}
-              handleAuthorChange={({target}) => setAuthor(target.value)}
-              handleUrlChange={({target}) => setUrl(target.value)}
-              title={title}
-              author={author}
-              url={url}/>
+          <BlogForm handleSubmit={handleCreateNewBlog} />
         </div>
         <button style={hideWhenVisible} onClick={() => setNewBlogFormVisible(true) }>new note</button>
         <button style={showWhenVisible} onClick={() => setNewBlogFormVisible(false)}>cancel</button>
       </div>
-
     )
   }
     
