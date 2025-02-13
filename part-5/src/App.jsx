@@ -15,13 +15,20 @@ const App = () => {
   
   const [user, setUser] = useState(null)
 
-
-
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
 
 
   const [newBlogFormVisible, setNewBlogFormVisible] = useState(false)
+
+  const updateBlogLikes = async (id, newBlog) => {
+    try {
+      const returnedBlog = await blogService.update(id, newBlog)
+      setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog))
+    } catch (exception) {
+
+    }
+  }
 
   const handleCreateNewBlog = async () => {
     event.preventDefault()
@@ -67,13 +74,6 @@ const App = () => {
           <BlogForm handleSubmit={handleCreateNewBlog}/>
         </Togglable>
       </div>
-      // <div>
-      //   <div style={showWhenVisible}>
-      //     <BlogForm handleSubmit={handleCreateNewBlog} />
-      //   </div>
-      //   <button style={hideWhenVisible} onClick={() => setNewBlogFormVisible(true) }>new note</button>
-      //   <button style={showWhenVisible} onClick={() => setNewBlogFormVisible(false)}>cancel</button>
-      // </div>
     )
   }
     
@@ -137,7 +137,7 @@ const App = () => {
 
   const blogsList = () => (
     blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlogLikes={updateBlogLikes}/>
     )
   )
 
