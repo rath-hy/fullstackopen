@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -62,12 +63,17 @@ const App = () => {
 
     return (
       <div>
-        <div style={showWhenVisible}>
-          <BlogForm handleSubmit={handleCreateNewBlog} />
-        </div>
-        <button style={hideWhenVisible} onClick={() => setNewBlogFormVisible(true) }>new note</button>
-        <button style={showWhenVisible} onClick={() => setNewBlogFormVisible(false)}>cancel</button>
+        <Togglable showButtonLabel='new blog' hideButtonLabel='cancel'>
+          <BlogForm handleSubmit={handleCreateNewBlog}/>
+        </Togglable>
       </div>
+      // <div>
+      //   <div style={showWhenVisible}>
+      //     <BlogForm handleSubmit={handleCreateNewBlog} />
+      //   </div>
+      //   <button style={hideWhenVisible} onClick={() => setNewBlogFormVisible(true) }>new note</button>
+      //   <button style={showWhenVisible} onClick={() => setNewBlogFormVisible(false)}>cancel</button>
+      // </div>
     )
   }
     
@@ -131,7 +137,7 @@ const App = () => {
 
   const blogsList = () => (
     blogs.map(blog =>
-      <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} />
     )
   )
 
