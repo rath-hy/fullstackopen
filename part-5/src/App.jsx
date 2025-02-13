@@ -31,6 +31,15 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (id) => {
+    try {
+      const response = await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+    } catch (exception) {
+
+    }
+  }
+
   const handleCreateNewBlog = async () => {
     event.preventDefault()
 
@@ -139,7 +148,7 @@ const App = () => {
   const blogsList = () => {
     return (
       blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlogLikes={updateBlogLikes}/>
+        <Blog key={blog.id} blog={blog} updateBlogLikes={updateBlogLikes} deleteBlog={deleteBlog}/>
       )
     )
   }

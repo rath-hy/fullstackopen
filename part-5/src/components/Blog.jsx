@@ -3,7 +3,7 @@ import blogService from '../services/blogs'
 
 
 
-const Blog = ({ blog, updateBlogLikes }) => {
+const Blog = ({ blog, updateBlogLikes, deleteBlog }) => {
   const [showDetails, setShowDetails] = useState(false)
 
   const blogStyle = {
@@ -23,6 +23,12 @@ const Blog = ({ blog, updateBlogLikes }) => {
     updateBlogLikes(blog.id, updatedBlog)
   }
 
+  const handleDelete = async () => {
+    if (confirm(`Are you sure you want to delete "${blog.title}" by ${blog.author}?`)) {
+      deleteBlog(blog.id)
+    }
+  }
+
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author} 
@@ -31,7 +37,9 @@ const Blog = ({ blog, updateBlogLikes }) => {
         <div>{blog.url}</div>
         <div>{blog.likes} <button onClick={handleLikes}>like</button></div>
         <div>{blog.author}</div>
+        <button onClick={handleDelete}>remove</button>
       </div>
+    
     </div>  
   )
 }
