@@ -25,6 +25,7 @@ const App = () => {
     try {
       const returnedBlog = await blogService.update(id, newBlog)
       setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog))
+      // setBlogs(blogs.sort())
     } catch (exception) {
 
     }
@@ -135,11 +136,13 @@ const App = () => {
   </form>
   )
 
-  const blogsList = () => (
-    blogs.map(blog =>
+  const blogsList = () => {
+    return (
+      blogs.sort((a, b) => b.likes - a.likes).map(blog =>
         <Blog key={blog.id} blog={blog} updateBlogLikes={updateBlogLikes}/>
+      )
     )
-  )
+  }
 
   const logout = () => {
     window.localStorage.removeItem('loggedInBlogAppUser')
