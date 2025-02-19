@@ -12,7 +12,7 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') //why empty strings and not null
   const [password, setPassword] = useState('')
-  
+
   const [user, setUser] = useState(null)
 
   const [notificationMessage, setNotificationMessage] = useState(null)
@@ -26,21 +26,17 @@ const App = () => {
       const returnedBlog = await blogService.update(id, newBlog)
       setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog))
       // setBlogs(blogs.sort())
-    } catch (exception) {
-
-    }
+    } catch (exception) { /* empty */ }
   }
 
   const deleteBlog = async (id) => {
     try {
       const response = await blogService.remove(id)
       setBlogs(blogs.filter(blog => blog.id !== id))
-    } catch (exception) {
-
-    }
+    } catch (exception) { /* empty */ }
   }
 
-  const handleCreateNewBlog = async () => {
+  const handleCreateNewBlog = async (title, setTitle, author, setAuthor, url, setUrl) => {
     event.preventDefault()
 
     try {
@@ -49,12 +45,12 @@ const App = () => {
         title,
         author
       }
-  
+
       const response = await blogService.create(newBlog)
       setBlogs([...blogs, response])
 
       const successfulBlogAdditionMessage = `A new blog "${title}" by ${author} added`
-  
+
       setTitle('')
       setAuthor('')
       setUrl('')
@@ -86,8 +82,8 @@ const App = () => {
       </div>
     )
   }
-    
-    
+
+
 
 
   const handleLogin = async (event) => {
@@ -119,34 +115,34 @@ const App = () => {
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
-    <div>
+      <div>
       username
-      <input 
-      type="text"
-      value={username}
-      name="Username"
-      onChange={ ({target}) => {setUsername(target.value)} }
-      />
-    </div>
-    
-    <div>
-      password
-      <input 
-        type="password"
-        value={password}
-        name="Password"
-        onChange={ ({target}) => {setPassword(target.value)} }
-      />
-    </div>
+        <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={ ({ target }) => {setUsername(target.value)} }
+        />
+      </div>
 
-    <div>
-      <button type="submit">login</button>
-    </div>
-  </form>
+      <div>
+      password
+        <input
+          type="password"
+          value={password}
+          name="Password"
+          onChange={ ({ target }) => {setPassword(target.value)} }
+        />
+      </div>
+
+      <div>
+        <button type="submit">login</button>
+      </div>
+    </form>
   )
 
   const blogsList = () => {
-   return (
+    return (
       blogs.sort((a, b) => b.likes - a.likes).map(blog =>
         <Blog key={blog.id} blog={blog} updateBlogLikes={updateBlogLikes} deleteBlog={deleteBlog}/>
       )
@@ -166,7 +162,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -188,12 +184,12 @@ const App = () => {
             <h2>log in to application</h2>
             {loginForm()}
           </div>
-           :
+          :
           <div>
-              <p>{user.name} logged in {logoutButton()}</p>
-              {newBlogForm()}
-              <br/>
-              {blogsList()}
+            <p>{user.name} logged in {logoutButton()}</p>
+            {newBlogForm()}
+            <br/>
+            {blogsList()}
           </div>
       }
     </div>
