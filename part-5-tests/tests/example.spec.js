@@ -1,4 +1,10 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const { loginWith } = require('./helper')
+
+const correctCredentials = {
+  username: 'bfranklin',
+  password: '1776'
+}
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -21,30 +27,42 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      const correctCredentials = {
-        username: 'bfranklin',
-        password: '1776'
-      }
-
-      await page.getByTestId('username-input').fill(correctCredentials.username)
-      await page.getByTestId('password-input').fill(correctCredentials.password)
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginWith(page, correctCredentials.username, correctCredentials.password)
       await expect(page.getByText('Bejamin Franklin logged in')).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      const correctCredentials = {
-        username: 'bfranklin',
-        password: 'wrong'
-      }
-
-      await page.getByTestId('username-input').fill(correctCredentials.username)
-      await page.getByTestId('password-input').fill(correctCredentials.password)
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginWith(page, 'wrong name', 'wrong password') // option 1
       await expect(page.getByText('Bejamin Franklin logged in')).not.toBeVisible()
     })
   })
-})
 
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      loginWith(page, correctCredentials.username, correctCredentials.password)
+    })
+  
+    test('a new blog can be created', async ({ page }) => {
+      const arbitraryNewBlog = {
+        title: 'How to be Useless',
+        author: 'Arbitrary Author',
+        url: 'Arbitrary URL'
+      }
+
+      await page.getByRole('button', { name: 'new blog'} ).click()
+      await expect(page.getByText('Title')).toBeVisible()
+      
+      await page.getByTestId('title-input').fill(arbitraryNewBlog.title)
+      await page.getByTestId('author-input').fill(arbitraryNewBlog.author)
+      await page.getByTestId('url-input').fill(arbitraryNewBlog.url)
+
+      await page.getByRole('button', { name: 'create' }).click()
+
+      const successMessage = `A new blog "${arbitraryNewBlog.title}" by ${arbitraryNewBlog.author} added`
+      await expect(page.getByText(successMessage)).toBeVisible()
+    })
+  })
+
+
+
+})
