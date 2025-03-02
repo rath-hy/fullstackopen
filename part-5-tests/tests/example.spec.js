@@ -61,7 +61,51 @@ describe('Blog app', () => {
       const successMessage = `A new blog "${arbitraryNewBlog.title}" by ${arbitraryNewBlog.author} added`
       await expect(page.getByText(successMessage)).toBeVisible()
     })
+
+    test.only('a blog can be liked', async ({ page }) => {
+      // //create a blog
+      // const arbitraryNewBlog = {
+      //   title: 'How to Like Me',
+      //   author: 'Iwant Tobeliked',
+      //   url: 'likeme.com'
+      // }
+  
+      // await page.getByRole('button', { name: 'new blog'} ).click()
+      // await expect(page.getByText('Title')).toBeVisible()
+      // await page.getByTestId('title-input').fill(arbitraryNewBlog.title)
+      // await page.getByTestId('author-input').fill(arbitraryNewBlog.author)
+      // await page.getByTestId('url-input').fill(arbitraryNewBlog.url)
+      // await page.getByRole('button', { name: 'create' }).click()
+  
+      //view the last blog
+      await page.getByTestId('view-and-hide').last().click()
+  
+      //get the initial like count
+      const initialLikeElement = page.getByTestId('like').last().locator('..')
+      const initialLikeText = await initialLikeElement.textContent()
+      const initialLikeCount = + initialLikeText.slice(0, -5) //removes the 'like'
+  
+      // console.log(initialLikeCount, '***')
+      // console.log(typeof(initialLikeCount), '***')
+  
+      //like the blog
+      await page.getByTestId('like').last().click()
+
+      // await expect(initialLikeElement).toContainText(`${initialLikeCount + 1} like`)
+
+      const newLikeElement = page.getByTestId('like').last().locator('..')
+      const newLikeText = await newLikeElement.textContent()
+      const newLikeCount = + newLikeText.slice(0, -5)
+
+      // console.log(newLikeCount, '&&&')
+
+      await expect(newLikeElement).toContainText(`${initialLikeCount + 1} like`)
+    })
+
+
   })
+
+
 
 
 
