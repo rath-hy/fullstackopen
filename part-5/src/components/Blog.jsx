@@ -31,12 +31,12 @@ const Blog = ({ blog, updateBlogLikes, deleteBlog }) => {
 
   return (
     <div style={blogStyle} className="blog">
-      {blog.title} {blog.author}
+      <span data-testid='blog-title'>{blog.title}</span> <span data-testid='blog-author'>{blog.author}</span>
       <button data-testid='view-and-hide' onClick={() => {setShowDetails(!showDetails)}}>{showDetails ? 'hide' : 'view'}</button>
       <div style={{ display: showDetails ? '' : 'none' }}>
         <div>{blog.url}</div>
         <div> {blog.likes} <button data-testid='like' onClick={handleLikes}>like</button></div>
-        <button onClick={handleDelete}>remove</button>
+        <button data-testid='delete' onClick={handleDelete}>remove</button>
       </div>
     </div>
   )

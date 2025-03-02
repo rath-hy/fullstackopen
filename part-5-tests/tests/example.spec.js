@@ -62,21 +62,7 @@ describe('Blog app', () => {
       await expect(page.getByText(successMessage)).toBeVisible()
     })
 
-    test.only('a blog can be liked', async ({ page }) => {
-      // //create a blog
-      // const arbitraryNewBlog = {
-      //   title: 'How to Like Me',
-      //   author: 'Iwant Tobeliked',
-      //   url: 'likeme.com'
-      // }
-  
-      // await page.getByRole('button', { name: 'new blog'} ).click()
-      // await expect(page.getByText('Title')).toBeVisible()
-      // await page.getByTestId('title-input').fill(arbitraryNewBlog.title)
-      // await page.getByTestId('author-input').fill(arbitraryNewBlog.author)
-      // await page.getByTestId('url-input').fill(arbitraryNewBlog.url)
-      // await page.getByRole('button', { name: 'create' }).click()
-  
+    test('a blog can be liked', async ({ page }) => {
       //view the last blog
       await page.getByTestId('view-and-hide').last().click()
   
@@ -101,9 +87,26 @@ describe('Blog app', () => {
 
       await expect(newLikeElement).toContainText(`${initialLikeCount + 1} like`)
     })
+  
+    test('a blog can be deleted', async ({ page }) => {
+      page.on('dialog', async dialog => {
+        await expect(dialog.type()).toBe('confirm')
+        await dialog.accept()
+      })
+
+      const bottomBlogTitle = await page.getByTestId('blog-title').last().textContent()
+      const bottomBlogAuthor = await page.getByTestId('blog-author').last().textContent()
+
+      await expect(page.getByText(`${bottomBlogTitle} ${bottomBlogAuthor}`)).toBeVisible()
+      await page.getByTestId('view-and-hide').last().click()
+      await page.getByTestId('delete').last().click()
+      await expect(page.getByText(`${bottomBlogTitle} ${bottomBlogAuthor}`)).not.toBeVisible()
+    })
 
 
   })
+
+  
 
 
 
