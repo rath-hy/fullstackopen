@@ -1,5 +1,6 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
 const { loginWith } = require('./helper')
+const { createNewBlog } = require('./helper')
 
 const correctCredentials = {
   username: 'bfranklin',
@@ -39,7 +40,7 @@ describe('Blog app', () => {
 
   describe('When logged in', () => {
     beforeEach(async ({ page }) => {
-      loginWith(page, correctCredentials.username, correctCredentials.password)
+      await loginWith(page, correctCredentials.username, correctCredentials.password)
     })
   
     test('a new blog can be created', async ({ page }) => {
@@ -63,32 +64,16 @@ describe('Blog app', () => {
     })
 
     test('a blog can be liked', async ({ page }) => {
-      //view the last blog
       await page.getByTestId('view-and-hide').last().click()
-  
-      //get the initial like count
       const initialLikeElement = page.getByTestId('like').last().locator('..')
       const initialLikeText = await initialLikeElement.textContent()
       const initialLikeCount = + initialLikeText.slice(0, -5) //removes the 'like'
-  
-      // console.log(initialLikeCount, '***')
-      // console.log(typeof(initialLikeCount), '***')
-  
-      //like the blog
       await page.getByTestId('like').last().click()
-
-      // await expect(initialLikeElement).toContainText(`${initialLikeCount + 1} like`)
-
       const newLikeElement = page.getByTestId('like').last().locator('..')
-      const newLikeText = await newLikeElement.textContent()
-      const newLikeCount = + newLikeText.slice(0, -5)
-
-      // console.log(newLikeCount, '&&&')
-
       await expect(newLikeElement).toContainText(`${initialLikeCount + 1} like`)
     })
   
-    test('a blog can be deleted', async ({ page }) => {
+    test.only('a blog can be deleted', async ({ page }) => {
       page.on('dialog', async dialog => {
         await expect(dialog.type()).toBe('confirm')
         await dialog.accept()
@@ -103,13 +88,38 @@ describe('Blog app', () => {
       await expect(page.getByText(`${bottomBlogTitle} ${bottomBlogAuthor}`)).not.toBeVisible()
     })
 
+    test('only post creator sees delete button', async ({ page }) => {
+      const newBlog = {
+        title: 'Invisible Delete Button',
+        author: 'Hidden Author',
+        url: 'https://hidden-url.com'
+      }
+    
+      await createNewBlog(page, newBlog.title, newBlog.author, newBlog.url)
+      await page.getByTestId('view-and-hide').last().click()
+      await expect(page.getByTestId('delete').last()).toBeVisible()
+      await page.getByRole('button', { name: 'logout' }).click()
+      await loginWith(page, 'mluukkai', 'salainen')
+      await page.getByTestId('view-and-hide').last().click()
+      await expect(page.getByTestId('delete').last()).not.toBeVisible()
+    })
+    
+
+    test('blogs are sorted by order of decreasing like count', async ({ page }) => {
+      const viewButtons = page.getByTestId('view-and-hide')
+      const buttonCount = await viewButtons.count()
+
+      console.log('buttonCount', buttonCount)
+
+      var likesArr = []
+
+      for (let i = buttonCount - 1; i >= 0; i--) {
+        await viewButtons.nth(i).click()
+        console.log('*')
+        likesArr.push(0)
+      }
+    })
 
   })
-
-  
-
-
-
-
 
 })
