@@ -30,6 +30,12 @@ const reducer = (state = initialState, action) => {
       : anecdote)
   }
 
+  else if (action.type === 'CREATE') {
+    return state.concat(asObject(action.payload.content))
+  }
+
+
+
   return state
 }
 
