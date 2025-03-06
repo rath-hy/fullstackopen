@@ -19,6 +19,21 @@ const asObject = (anecdote) => {
 
 const sortByVotes = (anecdotes) => anecdotes.sort((a, b) => b.votes - a.votes) 
 
+export const voter = (id) => {
+  return {
+    type: 'VOTE',
+    payload: { id }
+  }
+}
+
+export const creator = (content) => {
+  return {
+    type: 'CREATE',
+    payload: {
+      content
+    }
+  }
+}
 
 const initialState = anecdotesAtStart.map(asObject)
 
