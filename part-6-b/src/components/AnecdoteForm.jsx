@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { createAnecdote } from '../reducers/anecdoteReducer'
-import { setNotification } from '../reducers/notificationReducer'
+import { setNotificationWithDelay } from '../reducers/notificationReducer'
 
 const AnecdoteForm = () => {
   const dispatch = useDispatch()
@@ -9,11 +9,8 @@ const AnecdoteForm = () => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
-
     dispatch(createAnecdote(content))
-
-    const notification = `added new blog`
-    dispatch(setNotification(notification))
+    dispatch(setNotificationWithDelay('added new blog', 3))
   }
 
     return (<>
