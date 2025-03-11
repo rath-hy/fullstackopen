@@ -46,13 +46,13 @@ const anecdoteSlice = createSlice({
   reducers: {
     voteAnecdote(state, action) {
       return sortByVotes(state.map(anecdote => 
-        anecdote.id === action.payload.id 
+        anecdote.id === action.payload 
         ? {...anecdote, votes: anecdote.votes + 1} 
         : anecdote))
     },
 
     createAnecdote(state, action) {
-      return sortByVotes(state.concat(asObject(action.payload.content)))
+      return sortByVotes(state.concat(asObject(action.payload)))
     }
 
   }
