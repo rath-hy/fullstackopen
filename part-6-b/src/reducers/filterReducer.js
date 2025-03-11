@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-
 const initialState = 'ALL'
 
 const filterSlice = createSlice({
