@@ -9,15 +9,15 @@ import { createSlice } from '@reduxjs/toolkit'
 //   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
 // ]
 
-const getId = () => (100000 * Math.random()).toFixed(0)
+// const getId = () => (100000 * Math.random()).toFixed(0)
 
-const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0
-  }
-}
+// const asObject = (anecdote) => {
+//   return {
+//     content: anecdote,
+//     id: getId(),
+//     votes: 0
+//   }
+// }
 
 const sortByVotes = (anecdotes) => anecdotes.sort((a, b) => b.votes - a.votes) 
 
@@ -52,7 +52,8 @@ const anecdoteSlice = createSlice({
     },
 
     createAnecdote(state, action) {
-      return sortByVotes(state.concat(asObject(action.payload)))
+      console.log('in reducer, action.payload', action.payload)
+      return sortByVotes(state.concat(action.payload))
     },
 
     appendAnecdote(state, action) {
