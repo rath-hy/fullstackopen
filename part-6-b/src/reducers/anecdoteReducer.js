@@ -52,35 +52,11 @@ const anecdoteSlice = createSlice({
     },
 
     createAnecdote(state, action) {
-      // console.log('action payload', action.payload) 
       return sortByVotes(state.concat(asObject(action.payload.content)))
     }
 
   }
 })
-
-
-
-// const reducer = (state = initialState, action) => {
-//   console.log('state now: ', state)
-//   console.log('action', action)
-
-//   if (action.type === 'VOTE') {
-//     return sortByVotes(state.map(anecdote => 
-//       anecdote.id === action.payload.id 
-//       ? {...anecdote, votes: anecdote.votes + 1} 
-//       : anecdote))
-    
-//   }
-
-//   else if (action.type === 'CREATE') {
-//     return sortByVotes(state.concat(asObject(action.payload.content)))
-//   }
-
-//   return state
-// }
-
-// export default reducer
 
 export const { voteAnecdote, createAnecdote } = anecdoteSlice.actions
 export default anecdoteSlice.reducer
