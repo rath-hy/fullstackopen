@@ -7,26 +7,6 @@
     {
       "id": 2,
       "content": "best feature ever <3"
-    },
-    {
-      "content": "james",
-      "id": 3
-    },
-    {
-      "content": "james",
-      "id": 4
-    },
-    {
-      "content": "james",
-      "id": 5
-    },
-    {
-      "content": "jack",
-      "id": 6
-    },
-    {
-      "content": "jack",
-      "id": 7
     }
   ],
   "persons": [
@@ -39,21 +19,6 @@
       "id": 2,
       "name": "hellas",
       "number": "012-123123"
-    },
-    {
-      "name": "john",
-      "number": "123-123-123",
-      "id": 3
-    },
-    {
-      "name": "jack",
-      "number": "123",
-      "id": 4
-    },
-    {
-      "name": "123",
-      "number": "123",
-      "id": 5
     }
   ]
 }
