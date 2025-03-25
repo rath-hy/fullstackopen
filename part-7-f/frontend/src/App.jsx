@@ -9,21 +9,28 @@ import NewBlog from './components/NewBlog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
+//new imports
 import NotificationContext from './contexts/NotificationContext'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  // const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   // const [notification, setNotification] = useState(null)
 
   //new
   const [notification, dispatch] = useContext(NotificationContext)
 
-  useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
-  }, [])
+
+
+  //this is old code; works perfectly
+  // useEffect(() => {
+  //   blogService.getAll().then(blogs =>
+  //     setBlogs(blogs)
+  //   )
+  // }, [])
+
 
   useEffect(() => {
     const user = storage.loadUser()
@@ -33,6 +40,25 @@ const App = () => {
   }, [])
 
   const blogFormRef = createRef()
+
+
+  // const queryClient = useQueryClient()
+
+  //this is new code
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: () => blogService.getAll()
+  })
+
+  if (result.isLoading) {
+    return (
+      <div>
+        Loading...
+      </div>
+    )
+  }
+
+  const blogs = result.data
 
 const notify = (message, type = 'success') => {
   dispatch({
@@ -63,7 +89,7 @@ const notify = (message, type = 'success') => {
 
   const handleCreate = async (blog) => {
     const newBlog = await blogService.create(blog)
-    setBlogs(blogs.concat(newBlog))
+    // setBlogs(blogs.concat(newBlog))
     notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
     blogFormRef.current.toggleVisibility()
   }
@@ -76,7 +102,7 @@ const notify = (message, type = 'success') => {
     })
 
     notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
-    setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
+    // setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
   }
 
   const handleLogout = () => {
@@ -88,7 +114,7 @@ const notify = (message, type = 'success') => {
   const handleDelete = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       await blogService.remove(blog.id)
-      setBlogs(blogs.filter(b => b.id !== blog.id))
+      // setBlogs(blogs.filter(b => b.id !== blog.id))
       notify(`Blog ${blog.title}, by ${blog.author} removed`)
     }
   }
