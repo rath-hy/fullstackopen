@@ -13,7 +13,7 @@ import NotificationContext from './contexts/NotificationContext'
 import UserContext from './contexts/UserContext'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
-import { Routes, Route, useMatch } from 'react-router-dom'
+import { Routes, Route, useMatch, Link } from 'react-router-dom'
 import UsersView from './views/UsersView'
 import UserView from './views/UserView'
 import BlogView from './views/BlogView'
@@ -196,11 +196,18 @@ const notify = (message, type = 'success') => {
   const blogs = blogResult.data
   const specificBlog = blogMatch ? blogs.find(blog => blog.id === blogMatch.params.id) : null
 
+  const padding = {
+    padding: 3
+  }
+
   return (
     <div>
       <h2>blogs</h2>
       <Notification notification={notification} />
       <div>
+        <Link to='/' style={padding}>Blogs</Link>
+        <Link to='/users' style={padding}>Users</Link>
+
         {user.name} logged in
         <button onClick={handleLogout}>
           logout
