@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import storage from '../services/storage'
 
+import { Link } from 'react-router-dom'
+
 const Blog = ({ blog, handleVote, handleDelete }) => {
   const [visible, setVisible] = useState(false)
 
@@ -20,10 +22,10 @@ const Blog = ({ blog, handleVote, handleDelete }) => {
 
   return (
     <div style={style} className='blog'>
-      {blog.title} by {blog.author}
-      <button style={{ marginLeft: 3 }} onClick={() => setVisible(!visible)}>
+      <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
+      {/* <button style={{ marginLeft: 3 }} onClick={() => setVisible(!visible)}>
         {visible ? 'hide' : 'view'}
-      </button>
+      </button> */}
       {visible && (
         <div>
           <div><a href={blog.url}>{blog.url}</a></div>
