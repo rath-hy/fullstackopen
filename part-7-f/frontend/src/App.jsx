@@ -1,4 +1,4 @@
-import { useState, useEffect, createRef } from 'react'
+import { useState, useEffect, createRef, useContext } from 'react'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -9,10 +9,15 @@ import NewBlog from './components/NewBlog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
+import NotificationContext from './contexts/NotificationContext'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
+  // const [notification, setNotification] = useState(null)
+
+  //new
+  const [notification, dispatch] = useContext(NotificationContext)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -29,12 +34,21 @@ const App = () => {
 
   const blogFormRef = createRef()
 
-  const notify = (message, type = 'success') => {
-    setNotification({ message, type })
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
-  }
+const notify = (message, type = 'success') => {
+  dispatch({
+    type: type.toUpperCase(),
+    payload: message
+  })
+
+  setTimeout(() => {dispatch({type: 'CLEAR'})}, 3000)
+}
+
+  // const notify = (message, type = 'success') => {
+  //   setNotification({ message, type })
+  //   setTimeout(() => {
+  //     setNotification(null)
+  //   }, 5000)
+  // }
 
   const handleLogin = async (credentials) => {
     try {
@@ -43,9 +57,6 @@ const App = () => {
       storage.saveUser(user)
       notify(`Welcome back, ${user.name}`)
     } catch (error) {
-      //
-      console.log('***', error)
-      //
       notify('Wrong credentials', 'error')
     }
   }
