@@ -13,6 +13,9 @@ import NotificationContext from './contexts/NotificationContext'
 import UserContext from './contexts/UserContext'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
+import { Routes, Route } from 'react-router-dom'
+import Users from './views/Users'
+
 const App = () => {
   const [user, userDispatch] = useContext(UserContext)
   const [notification, dispatch] = useContext(NotificationContext)
@@ -144,16 +147,8 @@ const notify = (message, type = 'success') => {
 
   const byLikes = (a, b) => b.likes - a.likes
 
-  return (
+  const BlogList = (
     <div>
-      <h2>blogs</h2>
-      <Notification notification={notification} />
-      <div>
-        {user.name} logged in
-        <button onClick={handleLogout}>
-          logout
-        </button>
-      </div>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <NewBlog doCreate={handleCreate} />
       </Togglable>
@@ -165,6 +160,25 @@ const notify = (message, type = 'success') => {
           handleDelete={handleDelete}
         />
       )}
+    </div>
+  )
+
+  return (
+    <div>
+      <h2>blogs</h2>
+      <Notification notification={notification} />
+      <div>
+        {user.name} logged in
+        <button onClick={handleLogout}>
+          logout
+        </button>
+      </div>
+
+      <Routes>
+        <Route path='/users' element={<Users/>}/>
+        <Route path='/' element={BlogList}/>
+      </Routes>
+
     </div>
   )
 }
