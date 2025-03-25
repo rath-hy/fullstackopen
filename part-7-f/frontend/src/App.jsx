@@ -13,8 +13,11 @@ import NotificationContext from './contexts/NotificationContext'
 import UserContext from './contexts/UserContext'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useMatch } from 'react-router-dom'
 import Users from './views/Users'
+import User from './views/User'
+
+import axios from 'axios'
 
 const App = () => {
   const [user, userDispatch] = useContext(UserContext)
@@ -64,21 +67,13 @@ const App = () => {
     }
   })
 
-  const result = useQuery({
+  const blogResult = useQuery({
     queryKey: ['blogs'],
     queryFn: () => blogService.getAll(),
     refetchOnWindowFocus: false
   })
 
-  if (result.isLoading) {
-    return (
-      <div>
-        Loading...
-      </div>
-    )
-  }
-
-  const blogs = result.data
+  const blogs = blogResult.data
 
 const notify = (message, type = 'success') => {
   dispatch({
@@ -135,6 +130,36 @@ const notify = (message, type = 'success') => {
     }
   }
 
+  const userResult = useQuery({
+    queryKey: ['users'],
+    queryFn: () => axios.get('http://localhost:3001/api/users').then(response => response.data),
+    retry: false
+  })
+
+  const userMatch = useMatch('/users/:id')
+
+  const byLikes = (a, b) => b.likes - a.likes
+
+  const BlogList = () => {
+    if (blogs) {
+      return (
+        <div>
+          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+            <NewBlog doCreate={handleCreate} />
+          </Togglable>
+          {blogs.sort(byLikes).map(blog =>
+            <Blog
+              key={blog.id}
+              blog={blog}
+              handleVote={handleVote}
+              handleDelete={handleDelete}
+            />
+          )}
+        </div>
+      )
+    }
+  }
+
   if (!user) {
     return (
       <div>
@@ -145,23 +170,24 @@ const notify = (message, type = 'success') => {
     )
   }
 
-  const byLikes = (a, b) => b.likes - a.likes
+  if (blogResult.isLoading) {
+    return (
+      <div>
+        Waiting for blogs...
+      </div>
+    )
+  }
 
-  const BlogList = (
-    <div>
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <NewBlog doCreate={handleCreate} />
-      </Togglable>
-      {blogs.sort(byLikes).map(blog =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          handleVote={handleVote}
-          handleDelete={handleDelete}
-        />
-      )}
-    </div>
-  )
+  if (userResult.isLoading) {
+    return (
+      <div>
+        Waiting for users...
+      </div>
+    )
+  }
+
+  const users = userResult.data
+  const specificUser = userMatch ? users.find(user => user.id === userMatch.params.id) : null
 
   return (
     <div>
@@ -175,8 +201,9 @@ const notify = (message, type = 'success') => {
       </div>
 
       <Routes>
-        <Route path='/users' element={<Users/>}/>
-        <Route path='/' element={BlogList}/>
+        <Route path='/' element={<BlogList/>}/>
+        <Route path='/users' element={<Users users={users}/>}/>
+        <Route path='/users/:id' element={<User user={specificUser}/>}/>
       </Routes>
 
     </div>
