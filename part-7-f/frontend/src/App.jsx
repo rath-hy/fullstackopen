@@ -14,8 +14,9 @@ import UserContext from './contexts/UserContext'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
 import { Routes, Route, useMatch } from 'react-router-dom'
-import Users from './views/Users'
-import User from './views/User'
+import UsersView from './views/UsersView'
+import UserView from './views/UserView'
+import BlogView from './views/BlogView'
 
 import axios from 'axios'
 
@@ -73,7 +74,7 @@ const App = () => {
     refetchOnWindowFocus: false
   })
 
-  const blogs = blogResult.data
+  
 
 const notify = (message, type = 'success') => {
   dispatch({
@@ -98,8 +99,10 @@ const notify = (message, type = 'success') => {
   }
 
   const handleCreate = async (blog) => {
+    console.log('blog to create', blog)
+
     blogFormRef.current.toggleVisibility()
-    const newBlog = await newBlogMutation.mutateAsync( {blog} )
+    const newBlog = await newBlogMutation.mutateAsync(blog)
     if (newBlog) {
       notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
     }
@@ -137,6 +140,7 @@ const notify = (message, type = 'success') => {
   })
 
   const userMatch = useMatch('/users/:id')
+  const blogMatch = useMatch('/blogs/:id')
 
   const byLikes = (a, b) => b.likes - a.likes
 
@@ -189,6 +193,9 @@ const notify = (message, type = 'success') => {
   const users = userResult.data
   const specificUser = userMatch ? users.find(user => user.id === userMatch.params.id) : null
 
+  const blogs = blogResult.data
+  const specificBlog = blogMatch ? blogs.find(blog => blog.id === blogMatch.params.id) : null
+
   return (
     <div>
       <h2>blogs</h2>
@@ -202,8 +209,9 @@ const notify = (message, type = 'success') => {
 
       <Routes>
         <Route path='/' element={<BlogList/>}/>
-        <Route path='/users' element={<Users users={users}/>}/>
-        <Route path='/users/:id' element={<User user={specificUser}/>}/>
+        <Route path='/users' element={<UsersView users={users}/>}/>
+        <Route path='/users/:id' element={<UserView user={specificUser}/>}/>
+        <Route path='/blogs/:id' element={<BlogView blog={specificBlog}/>}/>
       </Routes>
 
     </div>
