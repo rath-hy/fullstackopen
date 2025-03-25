@@ -11,7 +11,8 @@ import Togglable from './components/Togglable'
 
 //new imports
 import NotificationContext from './contexts/NotificationContext'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+
 
 
 const App = () => {
@@ -42,7 +43,15 @@ const App = () => {
   const blogFormRef = createRef()
 
 
-  // const queryClient = useQueryClient()
+  const queryClient = useQueryClient()
+
+  const newBlogMutation = useMutation({
+    mutationFn: (newBlog) => blogService.create(newBlog),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    }
+  })
+
 
   //this is new code
   const result = useQuery({
@@ -59,6 +68,10 @@ const App = () => {
   }
 
   const blogs = result.data
+
+
+
+
 
 const notify = (message, type = 'success') => {
   dispatch({
@@ -88,9 +101,12 @@ const notify = (message, type = 'success') => {
   }
 
   const handleCreate = async (blog) => {
-    const newBlog = await blogService.create(blog)
+    const newBlog = newBlogMutation.mutate(blog)
+    // const newBlog = await blogService.create(blog)
     // setBlogs(blogs.concat(newBlog))
-    notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
+    if (newBlog) {
+      notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
+    }
     blogFormRef.current.toggleVisibility()
   }
 
