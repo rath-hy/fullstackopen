@@ -9,29 +9,12 @@ import NewBlog from './components/NewBlog'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
-//new imports
 import NotificationContext from './contexts/NotificationContext'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
-
-
 const App = () => {
-  // const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  // const [notification, setNotification] = useState(null)
-
-  //new
   const [notification, dispatch] = useContext(NotificationContext)
-
-
-
-  //this is old code; works perfectly
-  // useEffect(() => {
-  //   blogService.getAll().then(blogs =>
-  //     setBlogs(blogs)
-  //   )
-  // }, [])
-
 
   useEffect(() => {
     const user = storage.loadUser()
@@ -47,16 +30,37 @@ const App = () => {
 
   const newBlogMutation = useMutation({
     mutationFn: (newBlog) => blogService.create(newBlog),
+
+    //less efficient
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    // },
+
+    //more efficient
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    }
+  })
+
+  const updateBlogMutation = useMutation({
+    mutationFn: ({id, newBlog}) => blogService.update(id, newBlog),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] })
     }
   })
 
+  const deleteBlogMutation = useMutation({
+    mutationFn: (id) => blogService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    }
+  })
 
-  //this is new code
   const result = useQuery({
     queryKey: ['blogs'],
-    queryFn: () => blogService.getAll()
+    queryFn: () => blogService.getAll(),
+    refetchOnWindowFocus: false
   })
 
   if (result.isLoading) {
@@ -69,25 +73,13 @@ const App = () => {
 
   const blogs = result.data
 
-
-
-
-
 const notify = (message, type = 'success') => {
   dispatch({
     type: type.toUpperCase(),
     payload: message
   })
-
   setTimeout(() => {dispatch({type: 'CLEAR'})}, 3000)
 }
-
-  // const notify = (message, type = 'success') => {
-  //   setNotification({ message, type })
-  //   setTimeout(() => {
-  //     setNotification(null)
-  //   }, 5000)
-  // }
 
   const handleLogin = async (credentials) => {
     try {
@@ -101,24 +93,23 @@ const notify = (message, type = 'success') => {
   }
 
   const handleCreate = async (blog) => {
-    const newBlog = newBlogMutation.mutate(blog)
-    // const newBlog = await blogService.create(blog)
-    // setBlogs(blogs.concat(newBlog))
+    blogFormRef.current.toggleVisibility()
+    const newBlog = await newBlogMutation.mutateAsync( {blog} )
     if (newBlog) {
       notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
     }
-    blogFormRef.current.toggleVisibility()
   }
 
   const handleVote = async (blog) => {
     console.log('updating', blog)
-    const updatedBlog = await blogService.update(blog.id, {
-      ...blog,
-      likes: blog.likes + 1
+    const updatedBlog = await updateBlogMutation.mutateAsync({
+      id: blog.id,
+      newBlog: {
+        ...blog,
+        likes: blog.likes + 1
+      }
     })
-
     notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
-    // setBlogs(blogs.map(b => b.id === blog.id ? updatedBlog : b))
   }
 
   const handleLogout = () => {
@@ -129,8 +120,7 @@ const notify = (message, type = 'success') => {
 
   const handleDelete = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      await blogService.remove(blog.id)
-      // setBlogs(blogs.filter(b => b.id !== blog.id))
+      await deleteBlogMutation.mutateAsync(blog.id)
       notify(`Blog ${blog.title}, by ${blog.author} removed`)
     }
   }
