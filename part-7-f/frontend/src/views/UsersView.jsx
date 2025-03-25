@@ -3,7 +3,7 @@ import axios from "axios"
 import { Link } from 'react-router-dom'
 
 
-const Users = ({users}) => {
+const UsersView = ({users}) => {
   return (
     <table>
       <thead>
@@ -26,4 +26,4 @@ const Users = ({users}) => {
   )
 }
 
-export default Users
+export default UsersView
