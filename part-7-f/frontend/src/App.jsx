@@ -10,16 +10,20 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
 import NotificationContext from './contexts/NotificationContext'
+import UserContext from './contexts/UserContext'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
 const App = () => {
-  const [user, setUser] = useState(null)
+  const [user, userDispatch] = useContext(UserContext)
   const [notification, dispatch] = useContext(NotificationContext)
 
   useEffect(() => {
     const user = storage.loadUser()
     if (user) {
-      setUser(user)
+      userDispatch({
+        type: 'SET',
+        payload: user
+      })
     }
   }, [])
 
@@ -84,7 +88,10 @@ const notify = (message, type = 'success') => {
   const handleLogin = async (credentials) => {
     try {
       const user = await loginService.login(credentials)
-      setUser(user)
+      userDispatch({
+        type: 'SET',
+        payload: user
+      })
       storage.saveUser(user)
       notify(`Welcome back, ${user.name}`)
     } catch (error) {
@@ -113,7 +120,7 @@ const notify = (message, type = 'success') => {
   }
 
   const handleLogout = () => {
-    setUser(null)
+    userDispatch({ type: 'LOGOUT' })
     storage.removeUser()
     notify(`Bye, ${user.name}!`)
   }
