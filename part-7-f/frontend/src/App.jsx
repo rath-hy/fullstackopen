@@ -211,7 +211,7 @@ const notify = (message, type = 'success') => {
         <Route path='/' element={<BlogList/>}/>
         <Route path='/users' element={<UsersView users={users}/>}/>
         <Route path='/users/:id' element={<UserView user={specificUser}/>}/>
-        <Route path='/blogs/:id' element={<BlogView blog={specificBlog}/>}/>
+        <Route path='/blogs/:id' element={<BlogView blog={specificBlog} handleVote={handleVote}/>}/>
       </Routes>
 
     </div>
