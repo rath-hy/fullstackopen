@@ -12,9 +12,9 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
-const update = (id, newObject) => {
-  const request = axios.put(`${baseUrl}/${id}`, newObject, getConfit())
-  return request.then(response => response.data)
+const update = async (id, newObject) => {
+  const response = await axios.put(`${baseUrl}/${id}`, newObject, getConfit())
+  return response.data
 }
 
 const create = async (newObject) => {
@@ -27,4 +27,20 @@ const remove = async (id) => {
   return response.data
 }
 
-export default { getAll, create, update, remove }
+const getComments = (id) => {
+  const response = axios.get(`${baseUrl}/${id}/comments`)
+  return response.data
+}
+
+const comment = async (id, comment) => {
+  const allObjects = await getAll()
+  const specificObject = allObjects.find(object => object.id === id)
+  const updatedObject = {
+    ...specificObject,
+    comments: specificObject.comments.concat(comment)
+  }
+  console.log('updated object', updatedObject)
+  return await update(id, updatedObject)
+}
+
+export default { getAll, create, update, remove, comment, getComments }
