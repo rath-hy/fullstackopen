@@ -11,8 +11,11 @@ const queryClient = new QueryClient()
 
 import { BrowserRouter as Router } from 'react-router-dom'
 
+import { Container } from '@mui/material'
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <Router>
+  <Container>
+    <Router>
     <QueryClientProvider client={queryClient}>
       <UserContextProvider>
         <NotificationContextProvider>
@@ -21,4 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </UserContextProvider>
     </QueryClientProvider>
   </Router>
+
+  </Container>
+
 )

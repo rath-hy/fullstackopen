@@ -10,10 +10,10 @@ const Blog = ({ blog, handleVote, handleDelete }) => {
   const nameOfUser = blog.user ? blog.user.name : 'anonymous'
 
   const style = {
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1,
-    marginBottom: 5,
+    // border: 'solid',
+    // padding: 10,
+    // borderWidth: 1,
+    // marginBottom: 5,
   }
 
   const canRemove = blog.user ? blog.user.username === storage.me() : true
