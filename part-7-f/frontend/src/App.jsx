@@ -20,6 +20,22 @@ import BlogView from './views/BlogView'
 
 import axios from 'axios'
 
+import { 
+  Table, 
+  Paper, 
+  TableContainer,
+  TableBody,
+  TableRow,
+  TableCell,
+
+  AppBar,
+  Toolbar,
+  Button
+} from '@mui/material'
+
+
+
+
 const App = () => {
   const [user, userDispatch] = useContext(UserContext)
   const [notification, dispatch] = useContext(NotificationContext)
@@ -151,14 +167,38 @@ const notify = (message, type = 'success') => {
           <Togglable buttonLabel="create new blog" ref={blogFormRef}>
             <NewBlog doCreate={handleCreate} />
           </Togglable>
-          {blogs.sort(byLikes).map(blog =>
+
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {blogs.sort(byLikes).map(blog =>
+              <TableRow key={blog.id}>
+                <TableCell>
+                  <Blog
+                    key={blog.id}
+                    blog={blog}
+                    handleVote={handleVote}
+                    handleDelete={handleDelete}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+          {/* {blogs.sort(byLikes).map(blog =>
             <Blog
               key={blog.id}
               blog={blog}
               handleVote={handleVote}
               handleDelete={handleDelete}
             />
-          )}
+          )} */}
+
+          
+
+
         </div>
       )
     }
@@ -204,6 +244,23 @@ const notify = (message, type = 'success') => {
     <div>
       <h2>blogs</h2>
       <Notification notification={notification} />
+
+
+      <AppBar>
+        <Toolbar>
+          <Button color='inherit' component={Link} to='/'>
+            Blogs
+          </Button>
+          <Button color='inherit' component={Link} to='/users'>
+            Users
+          </Button>
+          <em>{user.name} logged in</em>
+          <button onClick={handleLogout}>
+            logout
+          </button>
+        </Toolbar>
+      </AppBar>
+{/*       
       <div>
         <Link to='/' style={padding}>Blogs</Link>
         <Link to='/users' style={padding}>Users</Link>
@@ -212,7 +269,7 @@ const notify = (message, type = 'success') => {
         <button onClick={handleLogout}>
           logout
         </button>
-      </div>
+      </div> */}
 
       <Routes>
         <Route path='/' element={<BlogList/>}/>
