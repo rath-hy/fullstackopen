@@ -7,6 +7,7 @@ mongoose.set('strictQuery', false)
 
 const Author = require('./models/author')
 const Book = require('./models/book')
+const { GraphQLError } = require('graphql')
 
 require('dotenv').config()
 
@@ -213,29 +214,30 @@ const resolvers = {
     },
 
     addBook: async (root, args) => {
-      console.log('add book called')
-
       const allAuthors = await Author.find({})
       const author = allAuthors.find(a => a.name === args.author) 
-
 
       if (!author) {
         resolvers.Mutation.addAuthor(null, { name: args.author } )
       }
-
-      console.log('***author exists!!!')
 
       const newBook = new Book({
         ...args,
         author: author
       })
 
-      console.log('newBook', newBook)
+      try {
+        const savedBook = await newBook.save()
+      } catch (error) {
+        throw new GraphQLError('save book failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+            error
+          }
+        })
+      }
 
-
-      const savedBook = await newBook.save()
-
-      console.log('savedBook', savedBook)
 
       return savedBook
     },
@@ -245,11 +247,15 @@ const resolvers = {
         ...args,
       })
 
-      return newAuthor.save()
-
-      //note to self: below is identical to top
-      const savedAuthor = await newAuthor.save()
-      return savedAuthor
+      try {
+        await newAuthor.save()
+      } catch (error) {
+        throw new GraphQLError('save author failed', {
+          code: 'BAD_USER_INPUT',
+          invalidArgs: args.name,
+          error
+        })
+      }
     },
 
     editAuthor: (root, args) => {
