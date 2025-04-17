@@ -2,6 +2,27 @@ const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const { v1: uuid } = require('uuid')
 
+const mongoose = require('mongoose')
+mongoose.set('strictQuery', false)
+
+const Author = require('./models/author')
+const Book = require('./models/book')
+
+require('dotenv').config()
+
+//remember to specify this in command
+const MONGODB_URI = process.env.MONGODB_URI
+console.log('connecting to', MONGODB_URI)
+
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connecting to MongoDB', error.message)
+  })
+
+
 let authors = [
   {
     name: 'Robert Martin',
@@ -27,13 +48,6 @@ let authors = [
     id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
   },
 ]
-
-/*
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
-*/
-
 
 let books = [
   {
@@ -87,10 +101,6 @@ let books = [
   },
 ]
 
-/*
-  you can remove the placeholder query once your first one has been implemented 
-*/
-
 const typeDefs = `
   type Query {
     bookCount: Int!
@@ -101,7 +111,7 @@ const typeDefs = `
 
   type Book {
     title: String!
-    author: String!
+    author: Author!
     published: String!
     genres: [String!]!
   }
@@ -117,19 +127,26 @@ const typeDefs = `
     addBook(title: String, author: String, published: Int, genres:[String]): Book
     addAuthor(name: String, born: Int): Author
     editAuthor(name: String, setBornTo: Int): Author
+
+    resetAuthors: [Author]
+    resetBooks: [Book]
   }
 `
 
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
-    allBooks: (root, args) => {
+    bookCount: async () => Book.collection.countDocuments(),
+    authorCount: () => Author.collection.countDocuments(),
+
+    //come back to this later
+    allBooks: async (root, args) => {
       const { author, genre } = args
 
-      return books.filter(book => {
-        const byAuthor = !author || book.author === author
+      const allBooks = await Book.find({}).populate('author')
+
+      return allBooks.filter(book => {
+        const byAuthor = !author || author === book.author.name
         const byGenre = !genre || book.genres.includes(genre)
         return byAuthor && byGenre
       })
@@ -150,6 +167,51 @@ const resolvers = {
 
 
   Mutation: {
+    resetAuthors: async () => {
+      try {
+        await Author.deleteMany({})
+
+        const authorSavePromises = authors.map(author => {
+          const newAuthor = new Author({
+            ...author,
+            id: null
+          })
+          return newAuthor.save()
+        })
+
+        const result = await Promise.all(authorSavePromises)
+        return result
+      } catch (error) {
+        console.error('error resetting authors', error)
+      }
+    },
+
+
+    resetBooks: async () => {
+
+      const allAuthors = await Author.find({})
+      const authorNameMap = new Map(allAuthors.map(author => [author.name, author]))
+
+      try {
+        await Book.deleteMany({})
+
+        const bookSavePromises = books.map(book => {
+          const bookAuthor = authorNameMap.get(book.author)
+          const newBook = new Book({
+            ...book,
+            author: bookAuthor,
+            id: null
+          })
+          return newBook.save()
+        })
+
+        const result = await Promise.all(bookSavePromises)
+        return result
+      } catch (error) {
+        console.error(error, 'error resetting books')
+      }
+    },
+
     addBook: (root, args) => {
       const author = authors.find(a => a.name === args.author)
 
