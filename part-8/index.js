@@ -7,7 +7,11 @@ mongoose.set('strictQuery', false)
 
 const Author = require('./models/author')
 const Book = require('./models/book')
+const User = require('./models/user')
+
 const { GraphQLError } = require('graphql')
+
+const jwt = require('jsonwebtoken')
 
 require('dotenv').config()
 
@@ -108,6 +112,8 @@ const typeDefs = `
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
+
+    me: User,
   }
 
   type Book {
@@ -131,12 +137,28 @@ const typeDefs = `
 
     resetAuthors: [Author]
     resetBooks: [Book]
+
+    createUser(username: String!, favoriteGenre: String!): User
+    login(username: String!, password: String!): Token
+  }
+
+  type User {
+    username: String!
+    favoriteGenre: String!
+    id: ID!
+  }
+
+  type Token {
+    value: String!
   }
 `
 
-
 const resolvers = {
   Query: {
+    me: async (root, args, context) => {
+      return context.currentUser
+    },
+
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
@@ -163,11 +185,57 @@ const resolvers = {
       })
 
       return result
-    }
+    },
+
+    
   },
 
 
   Mutation: {
+    createUser: async (root, args) => {
+      const user = new User({
+        ...args
+      })
+
+      try {
+        await user.save()
+      } catch (error) {
+        throw new GraphQLError('creating new user failed', {
+          code: 'BAD_USER_INPUT',
+          invalidArgs: args.username,
+          error
+        })
+      }
+
+      return user
+    },
+
+    login: async (root, args) => {
+
+      const user = await User.findOne({username: args.username})
+
+      if (!user || args.password !== 'sex') {
+        throw new GraphQLError('wrong credentials', {
+          code: 'BAD_USER_INPUT'
+        })
+      }
+
+      const userForToken = {
+        username: args.username,
+        id: user._id.toString()
+      }
+
+      console.log('userForToken', userForToken)
+
+      const token = {
+        value: jwt.sign(userForToken, process.env.JWT_SECRET)
+      }
+
+      return token
+
+    },
+
+
     resetAuthors: async () => {
       try {
         await Author.deleteMany({})
@@ -279,6 +347,23 @@ const server = new ApolloServer({
 
 startStandaloneServer(server, {
   listen: { port: 4000 },
+  context: async ({req, res}) => {
+    const auth = req ? req.headers.authorization : null
+
+    if (auth && auth.startsWith('bearer ')) {
+      const decodedToken = jwt.verify(
+        auth.substring(7) , process.env.JWT_SECRET)
+
+      console.log('decoded token', decodedToken)
+
+      const currentUser = await User.findById(decodedToken.id)
+      console.log('current user', currentUser)
+
+
+      return { currentUser }
+    }
+  }
+
 }).then(({ url }) => {
   console.log(`Server ready at ${url}`)
 })
