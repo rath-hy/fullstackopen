@@ -138,8 +138,6 @@ const resolvers = {
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
-
-    //come back to this later
     allBooks: async (root, args) => {
       const { author, genre } = args
 
@@ -152,16 +150,18 @@ const resolvers = {
       })
     },
 
-    allAuthors: () => {
-      const data = authors.map(author => {
+    allAuthors: async () => {
+      const allAuthors = await Author.find({})
+      const allBooks = await Book.find({}).populate('author')
+      const result = allAuthors.map(author => {
         return {
-          ...author,
-          bookCount: books.filter(book => book.author === author.name).length
+          name: author.name,
+          bookCount: allBooks.filter(book => book.author.name === author.name).length,
+          born: author.born || 0
         }
-      }
-    )
+      })
 
-    return data
+      return result
     }
   },
 
@@ -212,28 +212,44 @@ const resolvers = {
       }
     },
 
-    addBook: (root, args) => {
-      const author = authors.find(a => a.name === args.author)
+    addBook: async (root, args) => {
+      console.log('add book called')
+
+      const allAuthors = await Author.find({})
+      const author = allAuthors.find(a => a.name === args.author) 
+
 
       if (!author) {
         resolvers.Mutation.addAuthor(null, { name: args.author } )
       }
 
-      const newBook = {
+      console.log('***author exists!!!')
+
+      const newBook = new Book({
         ...args,
-        id: uuid()
-      }
-      books = books.concat(newBook)
-      return newBook
+        author: author
+      })
+
+      console.log('newBook', newBook)
+
+
+      const savedBook = await newBook.save()
+
+      console.log('savedBook', savedBook)
+
+      return savedBook
     },
 
-    addAuthor: (root, args) => {
-      const newAuthor = {
+    addAuthor: async (root, args) => {
+      const newAuthor = new Author ({
         ...args,
-        id: uuid()
-      }
-      authors = authors.concat(newAuthor)
-      return newAuthor
+      })
+
+      return newAuthor.save()
+
+      //note to self: below is identical to top
+      const savedAuthor = await newAuthor.save()
+      return savedAuthor
     },
 
     editAuthor: (root, args) => {
