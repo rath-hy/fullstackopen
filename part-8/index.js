@@ -303,8 +303,10 @@ const resolvers = {
         author: author
       })
 
+      console.log('*** new book', newBook)
+
       try {
-        const savedBook = await newBook.save()
+        await newBook.save()
       } catch (error) {
         throw new GraphQLError('save book failed', {
           extensions: {
@@ -316,7 +318,7 @@ const resolvers = {
       }
 
 
-      return savedBook
+      return newBook
     },
 
     addAuthor: async (root, args) => {
@@ -337,7 +339,7 @@ const resolvers = {
       }
     },
 
-    editAuthor: (root, args, context) => {
+    editAuthor: async (root, args, context) => {
       const currentUser = context.currentUser
       if (!currentUser) {
         throw new GraphQLError('not authenticated', {
@@ -347,14 +349,30 @@ const resolvers = {
         })
       }
 
-      const authorToUpdate = authors.find(author => author.name === args.name)
+      const updatedAuthor = await Author.findOneAndUpdate(
+        { name: args.name }, 
+        { born: args.setBornTo }, 
+        { new: true}
+      )
 
-      if (!authorToUpdate) {
-        return null
+      if (!updatedAuthor) {
+        throw new GraphQLError('author not found', {
+          extensions: {
+            code: 'BAD_USER_INPUT'
+          }
+        })
       }
-      
-      const updatedAuthor = {...authorToUpdate, born: args.setBornTo}
-      authors = authors.map(author => author.name === args.name ? updatedAuthor : author )
+
+      return updatedAuthor
+
+      // const authorToUpdate = authors.find(author => author.name === args.name)
+      // if (!authorToUpdate) {
+      //   return null
+      // }
+      // const updatedAuthor = {...authorToUpdate, born: args.setBornTo}
+      // authors = authors.map(author => author.name === args.name ? updatedAuthor : author )
+
+
       return updatedAuthor
     }
   }
@@ -370,14 +388,14 @@ startStandaloneServer(server, {
   context: async ({req, res}) => {
     const auth = req ? req.headers.authorization : null
 
-    if (auth && auth.startsWith('bearer ')) {
+    if (auth && auth.startsWith('Bearer ')) {
       const decodedToken = jwt.verify(
         auth.substring(7) , process.env.JWT_SECRET)
 
-      console.log('decoded token', decodedToken)
+      // console.log('decoded token', decodedToken)
 
       const currentUser = await User.findById(decodedToken.id)
-      console.log('current user', currentUser)
+      // console.log('current user', currentUser)
 
 
       return { currentUser }

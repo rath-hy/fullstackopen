@@ -8,7 +8,10 @@ const NEW_BOOK = gql`
   mutation($title: String, $author: String, $published: Int, $genres: [String]) {
     addBook(title: $title, author: $author, published: $published, genres: $genres, ) {
       title
-      author
+      author {
+        name
+        born
+      }
       published
       genres
     }

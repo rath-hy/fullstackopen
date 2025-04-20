@@ -1,5 +1,5 @@
 import { gql, useQuery, useMutation } from '@apollo/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const ALL_AUTHORS = gql`
   query {
@@ -31,9 +31,13 @@ const Authors = (props) => {
   const submit = (event) => {
     event.preventDefault()
 
-    editBirthyear( {
-      variables: { name: author, setBornTo: +birthyear }
-    })
+    console.log('*** author', author)
+
+    if (author) {
+      editBirthyear( {
+        variables: { name: author, setBornTo: +birthyear }
+      })
+    }
 
     setAuthor('')
     setBirthyear('')
@@ -42,6 +46,14 @@ const Authors = (props) => {
   const result = useQuery(ALL_AUTHORS, {
     pollInterval: 2000
   })
+
+  // useEffect(() => {
+  //   if (result.data?.allAuthors?.length) {
+  //     setAuthor(result.data.allAuthors[0].name)
+  //   }
+
+  // }, [result.data])
+
 
   if (!props.show) {
     return null
@@ -81,7 +93,7 @@ const Authors = (props) => {
       <h2>Set birthyear</h2>
       <form onSubmit={submit}>
         <div>
-          <select onChange={(event) => setAuthor(event.target.value)}>
+          <select value='Fyodor Dostoevsky' onChange={(event) => setAuthor(event.target.value)}>
             {authors.map(author => (
               <option value={author.name} key={author.name}>{author.name}</option>
             ))}
