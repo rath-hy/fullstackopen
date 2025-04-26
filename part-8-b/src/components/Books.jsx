@@ -1,4 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
+import { useState } from 'react'
 
 const ALL_BOOKS = gql`
   query {
@@ -15,6 +16,7 @@ const ALL_BOOKS = gql`
 `
 
 const Books = (props) => {
+  const [filter, setFilter] = useState('')
 
   const result = useQuery(ALL_BOOKS, {
     pollInterval: 2000
@@ -30,7 +32,24 @@ const Books = (props) => {
 
   const books = result.data.allBooks
 
-  // console.log('books', books)
+  var genreList = []
+
+  books.forEach(book => {
+    book.genres.forEach(genre => {
+      genreList = genreList.concat(genre)
+    })
+  });
+
+  const uniqueGenreList = [...new Set(genreList)]
+
+  const handleClick = (genre) => {
+    setFilter(genre)
+  }
+
+
+  //get a list of unique genres (remove duplicates)
+  //for each item in the list, create a button
+  //same changeHandler -- involving making a mutation with the filter param added
 
   return (
     <div>
@@ -43,7 +62,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
+          {books.filter(book => filter ? book.genres.includes(filter) : true).map((a) => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
@@ -52,6 +71,20 @@ const Books = (props) => {
           ))}
         </tbody>
       </table>
+
+
+      <button onClick={() => handleClick(null)}>
+        all genres
+      </button>
+
+      {
+        uniqueGenreList.map(genre => (
+          <button key={genre} onClick={() => handleClick(genre)}>
+            {genre}
+          </button>
+        ))
+      }
+
     </div>
   )
 }
