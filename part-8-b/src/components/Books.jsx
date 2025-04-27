@@ -1,9 +1,42 @@
 import { gql, useQuery } from '@apollo/client'
 import { useState } from 'react'
 
-const ALL_BOOKS = gql`
+// const ALL_BOOKS = gql`
+//   query {
+//     allBooks {
+//       title
+//       author {
+//         name
+//         born
+//       }
+//       published
+//       genres
+//     }
+//   }
+// `
+
+// const [bookData, setBookData] = useState(null)
+
+// const result = useQuery(ALL_BOOKS, {
+//   pollInterval: 2000
+// })
+
+// if (result.loading) {
+//   return <div>loading...</div>
+// }
+
+
+const ALL_GENRES = gql`
   query {
     allBooks {
+      genres
+    }
+  }
+`
+
+const FILTERED_BOOKS = gql`
+  query($genre: String, $author: String) {
+    allBooks(genre: $genre, author: $author) {
       title
       author {
         name
@@ -15,41 +48,34 @@ const ALL_BOOKS = gql`
   }
 `
 
-const Books = (props) => {
-  const [filter, setFilter] = useState('')
 
-  const result = useQuery(ALL_BOOKS, {
-    pollInterval: 2000
+
+const Books = (props) => {
+  const [filter, setFilter] = useState('refactoring')
+  // const [uniqueGenreList, setUniqueGenreList] = useState(null)
+
+  const filteredBooksResult = useQuery(FILTERED_BOOKS, {
+    variables: { genre: filter },
+    pollInterval: 2000,
   })
+
+  const allGenresResult = useQuery(ALL_GENRES)
 
   if (!props.show) {
     return null
   }
 
-  if (result.loading) {
+  if (filteredBooksResult.loading || allGenresResult.loading) {
     return <div>loading...</div>
   }
 
-  const books = result.data.allBooks
-
-  var genreList = []
-
-  books.forEach(book => {
-    book.genres.forEach(genre => {
-      genreList = genreList.concat(genre)
-    })
-  });
-
-  const uniqueGenreList = [...new Set(genreList)]
+  const books = filteredBooksResult.data?.allBooks || []
+  
+  const uniqueGenreList = [...new Set(allGenresResult.data.allBooks.flatMap(book => book.genres))]
 
   const handleClick = (genre) => {
     setFilter(genre)
   }
-
-
-  //get a list of unique genres (remove duplicates)
-  //for each item in the list, create a button
-  //same changeHandler -- involving making a mutation with the filter param added
 
   return (
     <div>
@@ -62,7 +88,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.filter(book => filter ? book.genres.includes(filter) : true).map((a) => (
+          {books.map(a => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
