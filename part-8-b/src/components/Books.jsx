@@ -51,7 +51,7 @@ const FILTERED_BOOKS = gql`
 
 
 const Books = (props) => {
-  const [filter, setFilter] = useState('refactoring')
+  const [filter, setFilter] = useState(null)
   // const [uniqueGenreList, setUniqueGenreList] = useState(null)
 
   const filteredBooksResult = useQuery(FILTERED_BOOKS, {

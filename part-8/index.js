@@ -292,10 +292,10 @@ const resolvers = {
       }
 
       const allAuthors = await Author.find({})
-      const author = allAuthors.find(a => a.name === args.author) 
+      let author = allAuthors.find(a => a.name === args.author) 
 
       if (!author) {
-        resolvers.Mutation.addAuthor(null, { name: args.author } )
+        author = await resolvers.Mutation.addAuthor(null, { name: args.author } )
       }
 
       const newBook = new Book({
@@ -327,7 +327,7 @@ const resolvers = {
       })
 
       try {
-        await newAuthor.save()
+        return await newAuthor.save()
       } catch (error) {
         throw new GraphQLError('save author failed', {
           extensions: {
