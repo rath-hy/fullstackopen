@@ -9,7 +9,7 @@ mutation Mutation($username: String!, $password: String!) {
 }
 `
 
-const Login = ( { show, setToken }) => {
+const Login = ( { show, setToken, setPage }) => {
   const [ username, setUsername ] = useState('')
   const [ password, setPassword ] = useState('')
 
@@ -39,6 +39,8 @@ const Login = ( { show, setToken }) => {
 
     setUsername('')
     setPassword('')
+
+    setPage("authors")
   }
 
   return (
@@ -49,7 +51,7 @@ const Login = ( { show, setToken }) => {
         <div>
           <input 
             value={username}
-            onChange={({target}) => {setUsername(target.value)}}
+            onChange={({target}) => setUsername(target.value)}
           />
         </div>
 
