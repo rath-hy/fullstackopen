@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useMatch } from 'react-router-dom'
 
 import { gql, useMutation} from '@apollo/client'
-
+import { updateCache } from '../App'
 
 const NEW_BOOK = gql`
   mutation($title: String, $author: String, $published: Int, $genres: [String]) {
@@ -35,7 +35,14 @@ const NewBook = (props) => {
     event.preventDefault()
     // console.log('add book...')
     createBook( {
-      variables: { title, author, published: +published, genres }
+      variables: { title, author, published: +published, genres },
+      onError: (error) => {
+        
+      },
+      update: (cache, response) => {
+        updateCache(cache, { query: ALL_BOOKS }, response.data.createBook )
+      }
+
     })
 
 
