@@ -16,6 +16,8 @@ const resolvers = {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
+      console.log('all books')
+
       const { author, genre } = args
 
       const allBooks = await Book.find({}).populate('author')
@@ -28,6 +30,8 @@ const resolvers = {
     },
 
     allAuthors: async () => {
+      console.log('all authors')
+
       const allAuthors = await Author.find({})
       const allBooks = await Book.find({}).populate('author')
       const result = allAuthors.map(author => {
