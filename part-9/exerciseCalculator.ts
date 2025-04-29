@@ -53,7 +53,7 @@ const rate = (average: number, target: number): Rating => {
   }
 };
 
-const calculateExercises = (dailyExerciseHours: number[], target: number): ExerciseData => {
+export const calculateExercises = (dailyExerciseHours: number[], target: number): ExerciseData => {
   const dailyAverage = dailyExerciseHours.reduce((a, b) => a + b) / dailyExerciseHours.length;
   const rating = rate(dailyAverage, target);
 
