@@ -1,4 +1,6 @@
-const calculateBmi = (heightInCm: number, weightInKg: number): string => {
+require.main === module
+
+export const calculateBmi = (heightInCm: number, weightInKg: number): string => {
   const heightInMeters: number = heightInCm / 100
   const bmi: number = weightInKg / Math.pow(heightInMeters, 2)
 
@@ -12,7 +14,7 @@ const calculateBmi = (heightInCm: number, weightInKg: number): string => {
     case (bmi >= 29.9):
       return 'obese'
     default:
-      'error'
+      return 'error'
   }
 }
 

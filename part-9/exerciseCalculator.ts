@@ -46,9 +46,9 @@ const rate = (average: number, target: number): Rating => {
       }
     default:
       return {
-        success: null,
-        rating: null,
-        ratingDescription: null,
+        success: false,
+        rating: -1,
+        ratingDescription: 'error',
       }
   }
 }
@@ -66,9 +66,9 @@ const calculateExercises = (dailyExerciseHours: number[], target: number): Exerc
   }
 }
 
-const arguments = process.argv.slice(2)
-const target = Number(arguments[0])
-const dailyExerciseHours = arguments.slice(1).map(Number)
+const args = process.argv.slice(2)
+const target = Number(args[0])
+const dailyExerciseHours = args.slice(1).map(Number)
 
 try {
   console.log(calculateExercises(dailyExerciseHours, target))
