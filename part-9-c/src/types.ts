@@ -16,3 +16,8 @@ export interface DiagnosisData {
 }
 
 export type NewPatientData = Omit<PatientData, "id">;
+
+export enum Gender {
+  Male = 'male',
+  Female = 'female',
+}
