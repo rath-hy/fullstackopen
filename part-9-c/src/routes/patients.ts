@@ -1,8 +1,27 @@
 import express from 'express';
-import { Response } from 'express';
-import { NonSensitivePatientData } from '../types';
+import { NewPatientData, NonSensitivePatientData, PatientData } from '../types';
 import patientService from '../services/patientService';
-import toNewPatientEntry from '../utils';
+import z from 'zod';
+import { NewPatientSchema } from '../utils';
+import { Request, Response, NextFunction } from "express";
+
+
+const errorMiddleware = (error: unknown, _req: Request, res: Response, next: NextFunction) => { 
+  if (error instanceof z.ZodError) {
+    res.status(400).send({ error: error.issues });
+  } else {
+    next(error);
+  }
+};
+
+const newPatientParser = (req: Request, _res: Response, next: NextFunction) => {
+  try {
+    NewPatientSchema.parse(req.body);
+    next();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
 const router = express.Router();
 
@@ -10,25 +29,11 @@ router.get('/', (_req, res: Response<NonSensitivePatientData[]>) => {
   res.json(patientService.getNonSensitiveEntries());
 });
 
-router.post('/', (req, res) => {
-  try {
-    const newPatientEntry = toNewPatientEntry(req.body);
-    const addedPatientEntry = patientService.addPatient(newPatientEntry);
-    res.json(addedPatientEntry);
-  } catch (error: unknown) {
-    let errorMessage = 'An error occured';
-    if (error instanceof Error) {
-      errorMessage += ` Error: ${error.message}`;
-    }
-    res.status(400).send(errorMessage);
-  }
+router.post('/', newPatientParser, (req: Request<unknown, unknown, NewPatientData>, res: Response<PatientData>) => {
+  const addedPatientEntry = patientService.addPatient(req.body);
+  res.json(addedPatientEntry);
 });
 
-export default router;
+router.use(errorMiddleware);
 
-/*
-What I did:
-  1. create a new type for the new patients (without id)
-  2. implement the services function to append to list of patient entries
-  3. do the router stuff above
-*/
+export default router;
