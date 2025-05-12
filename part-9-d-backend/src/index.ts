@@ -1,7 +1,11 @@
 import express from 'express';
 const app = express();
 import diaryRouter from './routes/diaries';
-app.use(express.json());
+import cors = require('cors');
+
+app.use(
+  cors(),
+  express.json());
 
 const PORT = 3000;
 
