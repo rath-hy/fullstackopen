@@ -8,9 +8,10 @@ export interface PatientData {
   ssn: string;
   gender: string;
   occupation: string;
+  entries: Entry[];
 }
 
-export type NonSensitivePatientData = Omit<PatientData, "ssn">;
+export type NonSensitivePatientData = Omit<PatientData, "ssn" | "entries">;
 
 export interface DiagnosisData {
   code: string;
@@ -18,10 +19,13 @@ export interface DiagnosisData {
   latin?: string;
 }
 
-// export type NewPatientData = Omit<PatientData, "id">;
 export type NewPatientData = z.infer<typeof NewPatientSchema>;
 
 export enum Gender {
   Male = "male",
   Female = "female",
+}
+
+export interface Entry {
+  text: string;
 }
