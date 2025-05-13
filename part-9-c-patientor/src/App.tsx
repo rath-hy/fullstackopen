@@ -4,16 +4,20 @@ import { Route, Link, Routes, useMatch, Navigate } from "react-router-dom";
 import { Button, Divider, Container, Typography } from '@mui/material';
 
 import { apiBaseUrl } from "./constants";
-import { Patient } from "./types";
+import { DiagnosisData, Patient } from "./types";
 
 import patientService from "./services/patients";
 import PatientListPage from "./components/PatientListPage";
 import PatientPage from "./components/PatientPage";
 
+import diagnosisService from "./services/diagnoses";
+
 const App = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const match = useMatch('/:id');
   const id = match ? match.params.id : null;
+
+  const [diagnoses, setDiagnoses] = useState<DiagnosisData[]>([]);
 
   useEffect(() => {
     void axios.get<void>(`${apiBaseUrl}/patients`);
@@ -22,7 +26,15 @@ const App = () => {
       const patients = await patientService.getAll();
       setPatients(patients);
     };
+
     void fetchPatientList();
+
+    const fetchDiagnoses = async () => {
+      const diagnoses = await diagnosisService.getAll();
+      setDiagnoses(diagnoses);
+    };
+
+    void fetchDiagnoses();
   }, []);
   
   return (
@@ -37,12 +49,12 @@ const App = () => {
           </Button>
           <Divider hidden />
           <Routes>
-            <Route path='/' element={<PatientListPage patients={patients} setPatients={setPatients} />} />
+            <Route path='/' element={<PatientListPage patients={patients} setPatients={setPatients}/>} />
             <Route 
               path='/:id' 
               element={ 
                 id 
-                ? <PatientPage id={id}/>
+                ? <PatientPage id={id} diagnoses={diagnoses}/>
                 : <Navigate to='/' replace />
               }
             />

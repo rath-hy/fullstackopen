@@ -1,9 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import axios from "axios";
 import { apiBaseUrl } from "../../constants";
-import { Patient } from '../../types';
+import { Patient, DiagnosisData } from '../../types';
 
-const PatientPage = ({id}: { id: string }) => {
+interface PatientPageProps {
+  id: string;
+  diagnoses: DiagnosisData[];
+}
+
+const PatientPage = ({ id, diagnoses }: PatientPageProps) => {
   const [ patient, setPatient ] = useState<Patient>();
 
   useEffect(() => {
@@ -29,7 +34,8 @@ const PatientPage = ({id}: { id: string }) => {
     );
   }
 
-  console.log(patient);
+  // console.log(patient);
+  // console.log(diagnoses);
   
   return (
     <>
@@ -39,12 +45,12 @@ const PatientPage = ({id}: { id: string }) => {
 
       <h1>entries</h1>
       <div>{patient.entries.map(entry => (
-        <>
+        <Fragment key={entry.id}>
           <p>{entry.date} <em>{entry.description}</em></p>
           {entry.diagnosisCodes?.map(code => (
-            <li>{code}</li>
+            <li key={code}>{code} {diagnoses.find(d => d.code === code)?.name}</li>
           ))}
-        </>
+        </Fragment>
       ))}</div>
     </>
   );
