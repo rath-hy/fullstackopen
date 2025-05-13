@@ -36,6 +36,16 @@ const PatientPage = ({id}: { id: string }) => {
       <h2>{patient.name}</h2>
       <div>ssh: {patient.ssn}</div>
       <div>occupation: {patient.occupation}</div>
+
+      <h1>entries</h1>
+      <div>{patient.entries.map(entry => (
+        <>
+          <p>{entry.date} <em>{entry.description}</em></p>
+          {entry.diagnosisCodes?.map(code => (
+            <li>{code}</li>
+          ))}
+        </>
+      ))}</div>
     </>
   );
 };
