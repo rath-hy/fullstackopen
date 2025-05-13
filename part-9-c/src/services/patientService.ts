@@ -40,7 +40,7 @@ const addPatient = (entry: NewPatientData): PatientData => {
 
 export default {
   getEntries,
-  getNonSensitivePatientData: getPatientData,
+  getPatientData,
   getNonSensitiveEntries,
   addPatient,
 };

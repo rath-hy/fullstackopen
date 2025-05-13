@@ -29,8 +29,8 @@ router.get('/', (_req, res: Response<NonSensitivePatientData[]>) => {
   res.json(patientService.getNonSensitiveEntries());
 });
 
-router.get('/:id', (req: Request<{ id: string }>, res: Response<NonSensitivePatientData>) => {
-  res.json(patientService.getNonSensitivePatientData(req.params.id));
+router.get('/:id', (req: Request<{ id: string }>, res: Response<PatientData>) => {
+  res.json(patientService.getPatientData(req.params.id));
 });
 
 router.post('/', newPatientParser, (req: Request<unknown, unknown, NewPatientData>, res: Response<PatientData>) => {
