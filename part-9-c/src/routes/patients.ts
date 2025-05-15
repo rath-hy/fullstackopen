@@ -1,10 +1,11 @@
 import express from 'express';
-import { NewPatientData, NonSensitivePatientData, PatientData } from '../types';
+import { NewPatientData, NonSensitivePatientData, PatientData, Entry } from '../types';
 import patientService from '../services/patientService';
 import z from 'zod';
-import { NewPatientSchema } from '../utils';
+import { NewEntry, NewPatientSchema } from '../utils';
 import { Request, Response, NextFunction } from "express";
 
+import { NewEntrySchema } from '../utils';
 
 const errorMiddleware = (error: unknown, _req: Request, res: Response, next: NextFunction) => { 
   if (error instanceof z.ZodError) {
@@ -17,6 +18,15 @@ const errorMiddleware = (error: unknown, _req: Request, res: Response, next: Nex
 const newPatientParser = (req: Request, _res: Response, next: NextFunction) => {
   try {
     NewPatientSchema.parse(req.body);
+    next();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+const newEntryParser = (req: Request, _res: Response, next: NextFunction) => {
+  try {
+    NewEntrySchema.parse(req.body);
     next();
   } catch (error: unknown) {
     next(error);
@@ -38,6 +48,21 @@ router.post('/', newPatientParser, (req: Request<unknown, unknown, NewPatientDat
   res.json(addedPatientEntry);
 });
 
+
+//error occurs here
+router.post('/:userId/entries', newEntryParser, (req: Request<{ userId: string }, unknown, NewEntry>, res: Response<Entry>) => {
+  const userId = req.params.userId;
+
+  const addedEntry = patientService.addEntry(userId, req.body);
+
+  res.json(addedEntry);
+}); 
+
 router.use(errorMiddleware);
 
 export default router;
+
+  // const result = NewEntrySchema.safeParse(req.body);
+  // if (!result.success) {
+  //   return res.status(400).send({ error: result.error.message });
+  // }
